@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: 2021 Max Reznik <reznikmm@gmail.com>
+#
+# SPDX-License-Identifier: MIT
+
+on: [push]
+name: Build
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build and check
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          path: declarative-regions
+      - name: REUSE Compliance Check
+        uses: fsfe/reuse-action@v1.1
+        with:
+          args: --root declarative-regions lint
+      - name: Ls -R
+        run: ls -R /home/runner/work/declarative-regions/declarative-regions
+      - name: Build RPM
+        uses: reznikmm/fedora-ada-action@v4
+        with:
+          spec: declarative-regions/.copr/declarative_regions.spec
