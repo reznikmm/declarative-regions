@@ -19,12 +19,30 @@ package body Regions.Contexts.Environments.Factories is
    -------------------
 
    overriding procedure Append_Entity
-     (Self   : access Factory; Region : in out Regions.Region'Class;
-      Symbol : Regions.Symbols.Symbol; Entity : Regions.Entities.Entity_Access)
+     (Self   : access Factory;
+      Region : in out Regions.Region'Class;
+      Symbol : Regions.Symbols.Symbol;
+      Entity : Regions.Entities.Entity_Access)
    is
+      use type Environments.Nodes.Environment_Node_Access;
+
+      Name : constant Selected_Entity_Name :=
+        Nodes.Base_Entity'Class (Entity.all).Name;
+
+      Reg  : Nodes.Base_Entity'Class renames Nodes.Base_Entity'Class (Region);
+      Env  : constant Environments.Nodes.Environment_Node_Access := Reg.Env;
+      Node : constant Nodes.Entity_Node_Access := Env.Nodes.Element (Reg.Name);
+      Pkg  : constant Package_Node_Access := Package_Node_Access (Node);
+      List : Package_Nodes.Selected_Entity_Name_Lists.List;
    begin
-      pragma Compile_Time_Warning
-        (Standard.True, "Append_Entity unimplemented");
+      pragma Assert (Env = Nodes.Base_Entity'Class (Entity.all).Env);
+
+      if Pkg.Names.Contains (Symbol) then
+         List := Pkg.Names.Element (Symbol);
+      end if;
+
+      List.Prepend (Name);
+      Pkg.Names.Insert (Symbol, List);
    end Append_Entity;
 
    --------------------
@@ -52,9 +70,10 @@ package body Regions.Contexts.Environments.Factories is
    ------------------
 
    overriding function Enter_Region
-     (Self   : access Factory; Environment : Regions.Environments.Environment;
-      Region : not null Regions.Entities.Packages.Package_Access)
-      return Regions.Environments.Environment
+     (Self        : access Factory;
+      Environment : Regions.Environments.Environment;
+      Region      : not null Regions.Entities.Packages.Package_Access)
+        return Regions.Environments.Environment
    is
    begin
       pragma Compile_Time_Warning
