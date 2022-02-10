@@ -48,11 +48,11 @@ package Regions.Contexts.Environments.Package_Nodes is
    overriding function Immediate_Visible_Backward
      (Self   : Package_Entity;
       Symbol : Symbols.Symbol)
-        return Entities.Entity_Iterator'Class;
+        return Regions.Entity_Iterator_Interfaces.Forward_Iterator'Class;
 
    overriding function Immediate_Visible
      (Self   : Package_Entity;
       Symbol : Symbols.Symbol)
-        return Entities.Entity_Iterator'Class;
+        return Regions.Entity_Iterator_Interfaces.Forward_Iterator'Class;
 
 end Regions.Contexts.Environments.Package_Nodes;

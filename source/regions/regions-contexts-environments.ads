@@ -16,6 +16,9 @@ package Regions.Contexts.Environments is
    --  function Use_Visible
    --  function Directly_Visible
 
+   function Nested_Regions (Self : Environment'Class)
+     return Regions.Entity_Iterator_Interfaces.Forward_Iterator'Class;
+
 private
 
    type Environment_Node_Access is

@@ -107,6 +107,7 @@ package body Regions.Contexts.Environments.Factories is
 
       Node        : constant Package_Node_Access :=
         new Regions.Contexts.Environments.Package_Nodes.Package_Node;
+      --  A pseudo-package to keep Standard in it.
    begin
       Environment.Nodes.Insert (Name, Nodes.Entity_Node_Access (Node));
 

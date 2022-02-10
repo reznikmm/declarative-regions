@@ -100,7 +100,7 @@ package body Regions.Shared_Lists is
 
    function Has_Element (Self : Cursor) return Boolean is
    begin
-      return Self.Item.Next /= null;
+      return Self.Item /= null;
    end Has_Element;
 
    --------------

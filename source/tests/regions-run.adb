@@ -23,5 +23,15 @@ begin
    Ctx.New_Selected_Name (Ctx.Root_Name, Std_Name_1, Std_Name);
    Std := F.Create_Package (Root, Std_Name);
    pragma Assert (Std.Is_Assigned);
-   Ada.Wide_Wide_Text_IO.Put_Line ("Hello!");
+
+   declare
+      Env : constant Regions.Environments.Environment :=
+        F.Enter_Region (Root, Std);
+      Int : Regions.Entity_Iterator_Interfaces.Forward_Iterator'Class :=
+        Env.Nested_Regions;
+   begin
+      for X in Int loop
+         Ada.Wide_Wide_Text_IO.Put_Line ("Hello!");
+      end loop;
+   end;
 end Regions.Run;

@@ -5,23 +5,23 @@
 
 package body Regions.Contexts.Environments.Package_Nodes is
 
-   type Entity_Cursor is new Regions.Entities.Entity_Cursor with record
+   type Entity_Cursor is new Regions.Entity_Cursor with record
       List_Cursor : Selected_Entity_Name_Lists.Cursor;
    end record;
 
    type Entity_Iterator
      (Env  : not null Regions.Contexts.Environments.Environment_Node_Access)
-   is new Regions.Entities.Entity_Iterator with record
+   is new Regions.Entity_Iterator_Interfaces.Forward_Iterator with record
       List : Selected_Entity_Name_Lists.List;
    end record;
 
    overriding function First (Self : Entity_Iterator)
-     return Regions.Entities.Entity_Cursor_Class;
+     return Regions.Entity_Cursor_Class;
 
    overriding function Next
      (Self   : Entity_Iterator;
-      Cursor : Regions.Entities.Entity_Cursor_Class)
-        return Regions.Entities.Entity_Cursor_Class;
+      Cursor : Regions.Entity_Cursor_Class)
+        return Regions.Entity_Cursor_Class;
 
    ---------------
    -- Empty_Map --
@@ -37,7 +37,7 @@ package body Regions.Contexts.Environments.Package_Nodes is
    -----------
 
    overriding function First (Self : Entity_Iterator)
-     return Regions.Entities.Entity_Cursor_Class
+     return Regions.Entity_Cursor_Class
    is
       First : constant Selected_Entity_Name_Lists.Cursor :=
         Self.List.Iterate.First;
@@ -48,7 +48,7 @@ package body Regions.Contexts.Environments.Package_Nodes is
             List_Cursor => First,
             Left        => Self.List.Length);
       else
-         return Result : Entity_Cursor (Entity => null, Left => 0);
+         return Entity_Cursor'(null, 0, Selected_Entity_Name_Lists.No_Element);
       end if;
    end First;
 
@@ -59,7 +59,8 @@ package body Regions.Contexts.Environments.Package_Nodes is
    overriding function Immediate_Visible
      (Self   : Package_Entity;
       Symbol : Symbols.Symbol)
-        return Entities.Entity_Iterator'Class is (raise Program_Error);
+        return Regions.Entity_Iterator_Interfaces.Forward_Iterator'Class
+          is (raise Program_Error);
 
    --------------------------------
    -- Immediate_Visible_Backward --
@@ -68,7 +69,7 @@ package body Regions.Contexts.Environments.Package_Nodes is
    overriding function Immediate_Visible_Backward
      (Self   : Package_Entity;
       Symbol : Symbols.Symbol)
-        return Entities.Entity_Iterator'Class is
+        return Regions.Entity_Iterator_Interfaces.Forward_Iterator'Class is
 
       Node : Package_Node renames
         Package_Node (Self.Env.Nodes.Element (Self.Name).all);
@@ -93,11 +94,11 @@ package body Regions.Contexts.Environments.Package_Nodes is
 
    overriding function Next
      (Self   : Entity_Iterator;
-      Cursor : Regions.Entities.Entity_Cursor_Class)
-        return Regions.Entities.Entity_Cursor_Class is
+      Cursor : Regions.Entity_Cursor_Class)
+        return Regions.Entity_Cursor_Class is
    begin
       if Cursor.Left = 0 then
-         return Result : Entity_Cursor (Entity => null, Left => 0);
+         return Entity_Cursor'(null, 0, Selected_Entity_Name_Lists.No_Element);
       else
          declare
             Value : Entity_Cursor renames Entity_Cursor (Cursor);
