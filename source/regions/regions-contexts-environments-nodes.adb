@@ -27,9 +27,7 @@ package body Regions.Contexts.Environments.Nodes is
       Name : Selected_Entity_Name)
       return Regions.Entities.Entity_Access
    is
-      Cached : Entity_Maps.Cursor := Self.Cache.Find (Name);
-      Cursor : Node_Maps.Cursor;
-      --  Node   : Entity_Node_Access;
+      Cached : constant Entity_Maps.Cursor := Self.Cache.Find (Name);
       Item   : Entity_Access;
       Result : Regions.Entities.Entity_Access;
    begin

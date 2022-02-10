@@ -4,8 +4,9 @@
 -------------------------------------------------------------
 
 with Regions.Contexts.Environments.Nodes;
+with Regions.Entities.Packages;
 with Regions.Shared_Hashed_Maps;
-with Regions.Shared_Lists;
+--  with Regions.Shared_Lists;
 
 private
 package Regions.Contexts.Environments.Package_Nodes is

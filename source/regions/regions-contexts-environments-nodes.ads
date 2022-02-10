@@ -5,6 +5,7 @@
 
 with Ada.Containers.Hashed_Maps;
 with Ada.Unchecked_Deallocation;
+with Regions.Entities;
 with Regions.Shared_Hashed_Maps;
 
 private

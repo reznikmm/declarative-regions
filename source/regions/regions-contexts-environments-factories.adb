@@ -24,8 +24,6 @@ package body Regions.Contexts.Environments.Factories is
       Symbol : Regions.Symbols.Symbol;
       Entity : Regions.Entities.Entity_Access)
    is
-      use type Environments.Environment_Node_Access;
-
       Name : constant Selected_Entity_Name :=
         Nodes.Base_Entity'Class (Entity.all).Name;
 
@@ -56,7 +54,7 @@ package body Regions.Contexts.Environments.Factories is
       return Regions.Entities.Packages.Package_Access
    is
       Env  : constant Environments.Environment_Node_Access :=
-        Environments.Environment_Node_Access (Environment.Data);
+        Environment.Data;
       Node : constant Package_Node_Access :=
         new Regions.Contexts.Environments.Package_Nodes.Package_Node;
    begin
@@ -79,9 +77,9 @@ package body Regions.Contexts.Environments.Factories is
         Nodes.Base_Entity'Class (Region.all);
 
       Env : constant Environments.Environment_Node_Access :=
-        Environments.Environment_Node_Access (Environment.Data);
+        Environment.Data;
 
-      Node : Environments.Environment_Node_Access := new
+      Node : constant Environments.Environment_Node_Access := new
         Regions.Contexts.Environments.Nodes.Environment_Node'
           (Context => Self.Context,
            Counter => 1,
@@ -92,8 +90,7 @@ package body Regions.Contexts.Environments.Factories is
       Node.Nested.Prepend (Reg.Name);
       --  Shell we copy Region to Env???
 
-      return (Ada.Finalization.Controlled with
-                Data => Environments.Environment_Node_Access (Node));
+      return (Ada.Finalization.Controlled with Data => Node);
    end Enter_Region;
 
    ----------------------

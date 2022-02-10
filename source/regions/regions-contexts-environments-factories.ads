@@ -3,8 +3,9 @@
 --  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
-with Regions.Factories;
+with Regions.Entities.Packages;
 with Regions.Environments;
+with Regions.Factories;
 
 package Regions.Contexts.Environments.Factories is
    pragma Preelaborate;

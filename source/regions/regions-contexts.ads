@@ -5,7 +5,6 @@
 
 private with Ada.Containers.Hashed_Maps;
 
-with Regions.Entities.Packages;
 with Regions.Symbols;
 
 package Regions.Contexts is
@@ -84,6 +83,9 @@ private
    type Entity_Name is new Natural;
    type Selected_Entity_Name is new Natural;
 
+   No_Profile : constant Profile_Id := 0;
+   --  To create an entity name without any profile
+
    type Profile_Kind is
      (Root_Data,
       Root_Code,
@@ -154,6 +156,10 @@ private
       Names    : Entity_Name_Maps.Map;
       Selected : Selected_Entity_Name_Maps.Map;
       Version  : aliased Change_Count := 0;
+
+      Last_Name     : Entity_Name := 0;
+      Last_Selected : Selected_Entity_Name := 0;
+      Last_Profile  : Profile_Id := 1;  --  Reserve Empty_Procedure_Profile
    end record;
 
 end Regions.Contexts;

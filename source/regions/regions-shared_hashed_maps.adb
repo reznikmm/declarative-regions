@@ -95,7 +95,7 @@ package body Regions.Shared_Hashed_Maps is
             end;
          elsif Next.Hash = Key_Hash then
             return Equivalent_Keys (Next.Key, Key);
-            -- FIXME: "Hash collision"
+            --  FIXME: "Hash collision"
          else
             return False;
          end if;
@@ -144,7 +144,7 @@ package body Regions.Shared_Hashed_Maps is
            and then Equivalent_Keys (Next.Key, Key)
          then
             return Next.Item;
-            -- FIXME: "Hash collision"
+            --  FIXME: "Hash collision"
          else
             raise Constraint_Error;
          end if;
@@ -200,6 +200,12 @@ package body Regions.Shared_Hashed_Maps is
    is
       Mask     : constant Hash_Type := Hash_Type (Branches - 1);
       Key_Hash : constant Hash_Type := Hash (Key);
+
+      function Create_Leaf return Node_Access;
+
+      procedure Descent
+        (Parent : in out Node_Access;
+         Shift  : Bit_Count);
 
       function Create_Leaf return Node_Access is
          Child : constant Node_Access := new Node'
@@ -364,7 +370,8 @@ package body Regions.Shared_Hashed_Maps is
            To_Index (Node, Hash, (Depth - 1) * Slit_Bits);
       begin
          if Index < Node.Length then
-            return Descend (Position.Path (1 .. Depth) & Node.Child (Index + 1));
+            return Descend
+              (Position.Path (1 .. Depth) & Node.Child (Index + 1));
          elsif Depth = 1 then
             return (Length => 0, Path => <>);
          else
@@ -386,7 +393,10 @@ package body Regions.Shared_Hashed_Maps is
    -- Pop_Count --
    ---------------
 
-   function Pop_Count (Value : Unsigned_64; Bit : Bit_Index) return Bit_Count is
+   function Pop_Count
+     (Value : Unsigned_64;
+      Bit   : Bit_Index) return Bit_Count
+   is
       Temp   : Unsigned_64 := Value;
       Result : Bit_Count := 0;
    begin
