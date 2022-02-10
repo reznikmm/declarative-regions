@@ -11,17 +11,17 @@ private
 package Regions.Contexts.Environments.Package_Nodes is
    pragma Preelaborate;
 
-   package Selected_Entity_Name_Lists is
-     new Regions.Shared_Lists (Selected_Entity_Name);
-
    function Hash
      (Value : Regions.Symbols.Symbol) return Ada.Containers.Hash_Type
        is (Ada.Containers.Hash_Type'Mod (Value));
+
+   type List_Change_Count is mod 2 ** 32;
 
    package Name_List_Maps is new Regions.Shared_Hashed_Maps
      (Regions.Symbols.Symbol,
       Selected_Entity_Name_Lists.List,
       Ada.Containers.Hash_Type,
+      List_Change_Count,
       Hash,
       Regions.Symbols."=",
       Selected_Entity_Name_Lists."=");
@@ -32,7 +32,7 @@ package Regions.Contexts.Environments.Package_Nodes is
      return Name_List_Maps.Map;
 
    type Package_Node is new Nodes.Entity_Node with record
-      Version : aliased Name_List_Maps.Change_Count := 0;
+      Version : aliased List_Change_Count := 0;
       Names   : Name_List_Maps.Map :=
         Empty_Map (Package_Node'Unchecked_Access);
    end record;

@@ -4,6 +4,8 @@
 -------------------------------------------------------------
 
 private with Ada.Finalization;
+private with Regions.Shared_Lists;
+limited private with Regions.Contexts.Environments.Nodes;
 
 package Regions.Contexts.Environments is
 
@@ -16,24 +18,18 @@ package Regions.Contexts.Environments is
 
 private
 
-   type Environment_Interface is limited interface;
-
-   not overriding procedure Rerference
-     (Self : in out Environment_Interface) is abstract;
-
-   not overriding procedure Unreference
-     (Self : in out Environment_Interface;
-      Last : out Boolean) is abstract;
-
-   type Environment_Interface_Access is
-     access all Environment_Interface'Class;
+   type Environment_Node_Access is
+     access all Regions.Contexts.Environments.Nodes.Environment_Node'Class;
 
    type Environment is new Ada.Finalization.Controlled with record
-      Data : Environment_Interface_Access;
+      Data : Environment_Node_Access;
    end record;
 
    overriding procedure Adjust (Self : in out Environment);
 
    overriding procedure Finalize (Self : in out Environment);
+
+   package Selected_Entity_Name_Lists is
+     new Regions.Shared_Lists (Selected_Entity_Name);
 
 end Regions.Contexts.Environments;

@@ -147,10 +147,13 @@ private
       Hash,
       "=");
 
+   type Change_Count is mod 2**32;
+
    type Context is tagged limited record
       Profiles : Profile_Maps.Map;
       Names    : Entity_Name_Maps.Map;
       Selected : Selected_Entity_Name_Maps.Map;
+      Version  : aliased Change_Count := 0;
    end record;
 
 end Regions.Contexts;

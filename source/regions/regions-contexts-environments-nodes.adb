@@ -15,7 +15,7 @@ package body Regions.Contexts.Environments.Nodes is
 
    function Empty_Map (Self : access Environment_Node) return Node_Maps.Map is
    begin
-      return Node_Maps.Empty_Map (Self.Version'Access);
+      return Node_Maps.Empty_Map (Self.Context.Version'Access);
    end Empty_Map;
 
    ----------------
@@ -23,7 +23,7 @@ package body Regions.Contexts.Environments.Nodes is
    ----------------
 
    function Get_Entity
-     (Self : in out Environment_Node;
+     (Self : in out Environment_Node'Class;
       Name : Selected_Entity_Name)
       return Regions.Entities.Entity_Access
    is
@@ -55,17 +55,17 @@ package body Regions.Contexts.Environments.Nodes is
    -- Rerference --
    ----------------
 
-   overriding procedure Rerference (Self : in out Environment_Node) is
+   procedure Reference (Self : in out Environment_Node'Class) is
    begin
       Self.Counter := Self.Counter + 1;
-   end Rerference;
+   end Reference;
 
    -----------------
    -- Unreference --
    -----------------
 
-   overriding procedure Unreference
-     (Self : in out Environment_Node;
+   procedure Unreference
+     (Self : in out Environment_Node'Class;
       Last : out Boolean) is
    begin
       Last := Self.Counter <= 1;

@@ -25,6 +25,7 @@ package Regions.Contexts.Environments.Nodes is
      (Selected_Entity_Name,
       Entity_Node_Access,
       Ada.Containers.Hash_Type,
+      Regions.Contexts.Change_Count,
       Hash,
       "=",
       "=",
@@ -41,26 +42,24 @@ package Regions.Contexts.Environments.Nodes is
 
    function Empty_Map (Self : access Environment_Node) return Node_Maps.Map;
 
-   type Environment_Node is limited new Environment_Interface with record
+   type Environment_Node (Context : access Regions.Contexts.Context) is
+     tagged limited
+   record
       Counter : Natural := 1;
-      Version : aliased Node_Maps.Change_Count := 0;
       Nodes   : Node_Maps.Map := Empty_Map (Environment_Node'Unchecked_Access);
       Cache   : Entity_Maps.Map;
+      Nested  : Selected_Entity_Name_Lists.List;
    end record;
 
    function Get_Entity
-     (Self : in out Environment_Node;
+     (Self : in out Environment_Node'Class;
       Name : Selected_Entity_Name) return Regions.Entities.Entity_Access;
 
-   overriding procedure Rerference (Self : in out Environment_Node);
+   procedure Reference (Self : in out Environment_Node'Class);
 
-   overriding procedure Unreference
-     (Self : in out Environment_Node;
+   procedure Unreference
+     (Self : in out Environment_Node'Class;
       Last : out Boolean);
-
-   type Environment_Node_Access is access all
-     Regions.Contexts.Environments.Nodes.Environment_Node
-       with Storage_Size => 0;
 
    type Base_Entity (Env : not null Environment_Node_Access) is
      abstract limited new Regions.Entities.Entity with

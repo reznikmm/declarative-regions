@@ -5,6 +5,7 @@ generic
    type Key_Type is private;
    type Element_Type is private;
    type Hash_Type is mod <>;
+   type Change_Count is mod <>;
 
    with function Hash (Key : Key_Type) return Hash_Type;
    with function Equivalent_Keys (Left, Right : Key_Type) return Boolean;
@@ -14,8 +15,6 @@ generic
 
 package Regions.Shared_Hashed_Maps is
    pragma Preelaborate;
-
-   type Change_Count is mod 2 ** 32;
 
    type Map is tagged private
      with Constant_Indexing => Constant_Indexing,

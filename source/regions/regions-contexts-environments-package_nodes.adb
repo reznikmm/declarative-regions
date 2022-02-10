@@ -11,7 +11,7 @@ package body Regions.Contexts.Environments.Package_Nodes is
    end record;
 
    type Entity_Iterator
-     (Env  : not null Environments.Nodes.Environment_Node_Access)
+     (Env  : not null Regions.Contexts.Environments.Environment_Node_Access)
    is new Regions.Entities.Entity_Iterator with record
       List : Selected_Entity_Name_Lists.List;
    end record;

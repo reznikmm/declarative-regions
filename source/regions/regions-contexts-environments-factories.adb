@@ -24,16 +24,16 @@ package body Regions.Contexts.Environments.Factories is
       Symbol : Regions.Symbols.Symbol;
       Entity : Regions.Entities.Entity_Access)
    is
-      use type Environments.Nodes.Environment_Node_Access;
+      use type Environments.Environment_Node_Access;
 
       Name : constant Selected_Entity_Name :=
         Nodes.Base_Entity'Class (Entity.all).Name;
 
       Reg  : Nodes.Base_Entity'Class renames Nodes.Base_Entity'Class (Region);
-      Env  : constant Environments.Nodes.Environment_Node_Access := Reg.Env;
+      Env  : constant Environments.Environment_Node_Access := Reg.Env;
       Node : constant Nodes.Entity_Node_Access := Env.Nodes.Element (Reg.Name);
       Pkg  : constant Package_Node_Access := Package_Node_Access (Node);
-      List : Package_Nodes.Selected_Entity_Name_Lists.List;
+      List : Selected_Entity_Name_Lists.List;
    begin
       pragma Assert (Env = Nodes.Base_Entity'Class (Entity.all).Env);
 
@@ -55,8 +55,8 @@ package body Regions.Contexts.Environments.Factories is
       Name        : Regions.Contexts.Selected_Entity_Name)
       return Regions.Entities.Packages.Package_Access
    is
-      Env  : constant Environments.Nodes.Environment_Node_Access :=
-        Environments.Nodes.Environment_Node_Access (Environment.Data);
+      Env  : constant Environments.Environment_Node_Access :=
+        Environments.Environment_Node_Access (Environment.Data);
       Node : constant Package_Node_Access :=
         new Regions.Contexts.Environments.Package_Nodes.Package_Node;
    begin
@@ -75,10 +75,25 @@ package body Regions.Contexts.Environments.Factories is
       Region      : not null Regions.Entities.Packages.Package_Access)
         return Regions.Environments.Environment
    is
+      Reg : Nodes.Base_Entity'Class renames
+        Nodes.Base_Entity'Class (Region.all);
+
+      Env : constant Environments.Environment_Node_Access :=
+        Environments.Environment_Node_Access (Environment.Data);
+
+      Node : Environments.Environment_Node_Access := new
+        Regions.Contexts.Environments.Nodes.Environment_Node'
+          (Context => Self.Context,
+           Counter => 1,
+           Nodes   => Env.Nodes,
+           Cache   => Nodes.Entity_Maps.Empty_Map,
+           Nested  => Env.Nested);
    begin
-      pragma Compile_Time_Warning
-        (Standard.True, "Enter_Region unimplemented");
-      return raise Program_Error with "Unimplemented function Enter_Region";
+      Node.Nested.Prepend (Reg.Name);
+      --  Shell we copy Region to Env???
+
+      return (Ada.Finalization.Controlled with
+                Data => Environments.Environment_Node_Access (Node));
    end Enter_Region;
 
    ----------------------
@@ -90,8 +105,8 @@ package body Regions.Contexts.Environments.Factories is
    is
       Name        : constant Selected_Entity_Name := Self.Context.Root_Name;
 
-      Environment : constant Environment_Node_Access :=
-        new Regions.Contexts.Environments.Nodes.Environment_Node;
+      Environment : constant Environment_Node_Access := new
+        Regions.Contexts.Environments.Nodes.Environment_Node (Self.Context);
 
       Node        : constant Package_Node_Access :=
         new Regions.Contexts.Environments.Package_Nodes.Package_Node;
@@ -99,7 +114,7 @@ package body Regions.Contexts.Environments.Factories is
       Environment.Nodes.Insert (Name, Nodes.Entity_Node_Access (Node));
 
       return (Ada.Finalization.Controlled with
-                Data => Environment_Interface_Access (Environment));
+                Data => Environments.Environment_Node_Access (Environment));
    end Root_Environment;
 
 end Regions.Contexts.Environments.Factories;
