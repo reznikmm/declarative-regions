@@ -110,6 +110,7 @@ package body Regions.Contexts.Environments.Factories is
       --  A pseudo-package to keep Standard in it.
    begin
       Environment.Nodes.Insert (Name, Nodes.Entity_Node_Access (Node));
+      Environment.Nested.Prepend (Name);
 
       return (Ada.Finalization.Controlled with
                 Data => Environments.Environment_Node_Access (Environment));

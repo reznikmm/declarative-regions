@@ -46,7 +46,7 @@ package body Regions.Contexts.Environments.Package_Nodes is
          return Entity_Cursor'
            (Entity      => Self.Env.Get_Entity (Self.List (First)),
             List_Cursor => First,
-            Left        => Self.List.Length);
+            Left        => Self.List.Length - 1);
       else
          return Entity_Cursor'(null, 0, Selected_Entity_Name_Lists.No_Element);
       end if;
