@@ -1,0 +1,38 @@
+--  SPDX-FileCopyrightText: 2022 Max Reznik <reznikmm@gmail.com>
+--
+--  SPDX-License-Identifier: Apache-2.0
+-------------------------------------------------------------
+
+package Regions.Entities is
+   pragma Preelaborate;
+
+   type Entity (<>) is abstract tagged limited private;
+
+   function Assigned (Self : access Entity'Class) return Boolean
+     is (Self /= null);
+   --  Check if Self /= null
+
+   not overriding function Has_Region (Self : Entity) return Boolean
+     is abstract;
+   --  Check if the entity has a corresponding declarative region
+
+   not overriding function Immediate_Visible
+     (Self   : Entity;
+      Symbol : Regions.Symbol) return Entity_Access_Array is abstract;
+   --  For entity wihout declarative region (e.g. enumeration type) return an
+   --  empty array. Otherwise, return array of entities in the corresponding
+   --  region for the given symbol in order of their declaration.
+
+   function Region (Self : in out Entity'Class) return Region_Access
+     with Pre => Self.Has_Region;
+
+private
+   type Entity (Env : not null Environment_Access) is abstract tagged limited
+   record
+      Region : aliased Regions.Region (Entity'Unchecked_Access);
+   end record;
+
+   function Region (Self : in out Entity'Class) return Region_Access is
+      (Self.Region'Unchecked_Access);
+
+end Regions.Entities;
