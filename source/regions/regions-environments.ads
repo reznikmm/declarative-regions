@@ -9,39 +9,38 @@ private with Ada.Unchecked_Deallocation;
 private with Regions.Entities;
 private with Regions.Shared_Hashed_Maps;
 private with Regions.Shared_Lists;
-private with Regions.Contexts;
+with Regions.Contexts;
 
 package Regions.Environments is
    pragma Preelaborate;
 
-   type Environment is tagged limited private;
+   type Environment (Context : Context_Access) is tagged limited private;
 
    function Nested_Regions (Self : Environment'Class)
      return Regions.Region_Access_Array;
 
 private
-   function Hash (List : Selected_Entity_Name) return Ada.Containers.Hash_Type
-     is (Ada.Containers.Hash_Type'Mod (List));
 
    procedure Free is new Ada.Unchecked_Deallocation
      (Regions.Entities.Entity'Class, Entity_Access);
 
    package Entity_Maps is new Regions.Shared_Hashed_Maps
-     (Selected_Entity_Name,
+     (Regions.Contexts.Selected_Entity_Name,
       Entity_Access,
       Ada.Containers.Hash_Type,
       Change_Count,
-      Hash,
-      "=",
+      Regions.Contexts.Hash,
+      Regions.Contexts."=",
       "=",
       Free);
 
    package Entity_Name_Lists is new Regions.Shared_Lists
-     (Selected_Entity_Name);
+     (Regions.Contexts.Selected_Entity_Name,
+      Regions.Contexts."=");
 
    Version : aliased Change_Count := 1;
 
-   type Environment is
+   type Environment (Context : Context_Access) is
    tagged limited record
       Entity_Map : Entity_Maps.Map :=
         Entity_Maps.Empty_Map (Version'Unchecked_Access);

@@ -5,7 +5,8 @@
 
 function Regions.Environments.Get_Entity
   (Self : Environment'Class;
-   Name : Natural) return Entity_Access is
+   Name : Regions.Contexts.Selected_Entity_Name)
+     return Entity_Access is
 begin
-   return Self.Entity_Map.Element (Selected_Entity_Name (Name));
+   return Self.Entity_Map.Element (Name);
 end Regions.Environments.Get_Entity;

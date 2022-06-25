@@ -3,7 +3,9 @@
 --  SPDX-License-Identifier: Apache-2.0
 -------------------------------------------------------------
 
+with Regions.Contexts;
 function Regions.Environments.Get_Entity
   (Self : Environment'Class;
-   Name : Natural) return Entity_Access with Inline;
+   Name : Regions.Contexts.Selected_Entity_Name)
+     return Entity_Access with Inline;
 pragma Preelaborate (Regions.Environments.Get_Entity);

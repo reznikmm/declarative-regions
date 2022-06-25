@@ -4,11 +4,10 @@
 -------------------------------------------------------------
 
 with Regions.Entities.Roots;
+with Regions.Entities.Packages;
 with Regions.Contexts;
 
 package body Regions.Environments.Factory is
-
-   type Context_Access is access all Regions.Contexts.Context'Class;
 
    --------------------
    -- Create_Package --
@@ -16,9 +15,24 @@ package body Regions.Environments.Factory is
 
    procedure Create_Package
      (Self   : in out Environment;
-      Symbol : Regions.Symbol) is
+      Symbol : Regions.Symbol)
+   is
+      Entity : constant Entity_Access :=
+        new Regions.Entities.Entity'Class'
+          (Regions.Entities.Packages.Create (Self'Unchecked_Access, Symbol));
+
+      Id     : constant Regions.Contexts.Selected_Entity_Name :=
+        Entity_Name_Lists.First_Element (Self.Nested);
+
+      Parent : constant Entity_Access :=
+        Get_Entity (Self'Unchecked_Access, Id);
+
+      Name : Regions.Contexts.Selected_Entity_Name;
    begin
-      null;
+      --  Insert Entity into environment
+      Parent.Region.Insert (Symbol, Entity, Name);
+      Self.Entity_Map.Insert (Name, Entity);
+      Self.Nested.Prepend (Name);
    end Create_Package;
 
    ----------------
@@ -29,19 +43,13 @@ package body Regions.Environments.Factory is
      (Self     : in out Environment;
       Standard : Symbol)
    is
-      Root : Entity_Access :=
+      Root : constant Entity_Access :=
         new Regions.Entities.Entity'Class'
           (Regions.Entities.Roots.Create (Self'Unchecked_Access, Standard));
    begin
-      if Context = null then
-         declare
-            Object : constant Context_Access := new Regions.Contexts.Context;
-         begin
-            Context := Regions.Context_Access (Object);
-         end;
-      end if;
+      Self.Entity_Map.Insert (Self.Context.Root_Name, Root);
 
-      Self.Entity_Map.Insert (Context.Root_Name, Root);
+      Self.Nested.Prepend (Self.Context.Root_Name);
    end Initialize;
 
 end Regions.Environments.Factory;

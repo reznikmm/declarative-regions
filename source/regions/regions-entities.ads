@@ -27,10 +27,26 @@ package Regions.Entities is
      with Pre => Self.Has_Region;
 
 private
+
+   type Embedded_Region is new Regions.Region with null record;
+
+   overriding procedure Insert
+     (Self   : in out Embedded_Region;
+      Symbol : Regions.Symbol;
+      Entity : Entity_Access;
+      Name   : out Regions.Contexts.Selected_Entity_Name);
+
    type Entity (Env : not null Environment_Access) is abstract tagged limited
    record
-      Region : aliased Regions.Region (Entity'Unchecked_Access);
+      Region : aliased Embedded_Region (Entity'Unchecked_Access);
    end record;
+
+   not overriding procedure Insert
+     (Self   : in out Entity;
+      Symbol : Regions.Symbol;
+      Entity : Entity_Access;
+      Name   : out Regions.Contexts.Selected_Entity_Name) is null;
+   --  I want it to be abstract
 
    function Region (Self : in out Entity'Class) return Region_Access is
       (Self.Region'Unchecked_Access);

@@ -1,7 +1,19 @@
 with Ada.Containers.Hashed_Maps;
 
-private package Regions.Contexts is
+package Regions.Contexts is
    pragma Preelaborate;
+
+   type Profile_Id is private;
+   type Entity_Name is private;
+   type Selected_Entity_Name is private;
+
+   No_Profile : constant Profile_Id;
+   --  To create an non-overloadable entity (without any profile)
+
+   Root_Entity : constant Selected_Entity_Name;
+   --  An artifical entity containing standard package
+
+   function Hash (List : Selected_Entity_Name) return Ada.Containers.Hash_Type;
 
    type Context is tagged limited private;
 
@@ -60,6 +72,16 @@ private package Regions.Contexts is
       Selector : Entity_Name) return Selected_Entity_Name;
 
 private
+
+   type Profile_Id is new Natural;
+   type Entity_Name is new Natural;
+   type Selected_Entity_Name is new Natural;
+
+   No_Profile : constant Profile_Id := 0;
+   --  To create an non-overloadable entity (without any profile)
+   Root_Entity : constant Selected_Entity_Name := 1;
+   --  An artifical entity containing standard package
+
 
    type Profile_Kind is
      (Root_Data,
@@ -136,4 +158,8 @@ private
       Last_Selected : Selected_Entity_Name := 0;
       Last_Profile  : Profile_Id := 1;  --  Reserve Empty_Procedure_Profile
    end record;
+
+   function Hash (List : Selected_Entity_Name) return Ada.Containers.Hash_Type
+     is (Ada.Containers.Hash_Type'Mod (List));
+
 end Regions.Contexts;

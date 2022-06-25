@@ -4,6 +4,7 @@
 -------------------------------------------------------------
 
 with Ada.Containers;
+with Regions.Contexts;
 with Regions.Shared_Hashed_Maps;
 with Regions.Shared_Lists;
 
@@ -20,22 +21,26 @@ package Regions.Entities.Packages is
 private
 
    package Entity_Name_Lists is new Regions.Shared_Lists
-     (Selected_Entity_Name);
+     (Regions.Contexts.Selected_Entity_Name,
+      Regions.Contexts."=");
 
    function Hash (Value : Regions.Symbol) return Ada.Containers.Hash_Type is
      (Ada.Containers.Hash_Type'Mod (Value));
 
-   package Entity_Maps is new Regions.Shared_Hashed_Maps
+   package Name_Maps is new Regions.Shared_Hashed_Maps
      (Regions.Symbol,
       Entity_Name_Lists.List,
       Ada.Containers.Hash_Type,
       Change_Count,
       Hash,
       "=",
-      "=");
+      Entity_Name_Lists."=");
+
+   Package_Version : aliased Change_Count := 0;
 
    type Package_Entity is new Entity with record
       Symbol : Regions.Symbol;
+      Names  : Name_Maps.Map := Name_Maps.Empty_Map (Package_Version'Access);
    end record;
 
    overriding function Has_Region (Self : Package_Entity) return Boolean

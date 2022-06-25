@@ -26,8 +26,8 @@ package body Regions is
 
    function Get_Entity
      (Env  : Environment_Access;
-      Name : Selected_Entity_Name) return Entity_Access is
-        (Regions.Environments.Get_Entity (Env.all, Natural (Name)));
+      Name : Regions.Contexts.Selected_Entity_Name) return Entity_Access is
+        (Regions.Environments.Get_Entity (Env.all, Name));
 
    -----------------------
    -- Immediate_Visible --

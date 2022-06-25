@@ -5,7 +5,7 @@
 
 limited with Regions.Entities;
 limited with Regions.Environments;
-limited private with Regions.Contexts;
+limited with Regions.Contexts;
 
 package Regions is
    pragma Preelaborate;
@@ -18,7 +18,10 @@ package Regions is
    type Environment_Access is
      access all Regions.Environments.Environment'Class;
 
-   type Region is tagged limited private;
+   type Context_Access is access all Regions.Contexts.Context'Class
+     with Storage_Size => 0;
+
+   type Region is abstract tagged limited private;
 
    type Region_Access is access all Region'Class;
    type Region_Access_Array is array (Positive range <>) of Region_Access;
@@ -36,25 +39,20 @@ package Regions is
 
 private
 
-   type Profile_Id is new Natural;
-   type Entity_Name is new Natural;
-   type Selected_Entity_Name is new Natural;
    type Change_Count is mod 2 ** 32;
 
-   No_Profile : constant Profile_Id := 0;
-   --  To create an non-overloadable entity (without any profile)
-   Root_Entity : Selected_Entity_Name := 1;
-   --  An artifical entity containing standard package
+   type Region (Entity : Entity_Access := null) is
+     abstract tagged limited null record;
 
-   type Region (Entity : Entity_Access := null) is tagged limited null record;
+   not overriding procedure Insert
+     (Self   : in out Region;
+      Symbol : Regions.Symbol;
+      Entity : Entity_Access;
+      Name   : out Regions.Contexts.Selected_Entity_Name) is null;
+   --  I want it to be abstract :(
 
    function Get_Entity
      (Env  : Environment_Access;
-      Name : Selected_Entity_Name) return Entity_Access;
-
-   type Context_Access is access all Regions.Contexts.Context'Class
-     with Storage_Size => 0;
-
-   Context : Context_Access;
+      Name : Regions.Contexts.Selected_Entity_Name) return Entity_Access;
 
 end Regions;

@@ -3,7 +3,10 @@
 --  SPDX-License-Identifier: Apache-2.0
 -------------------------------------------------------------
 
-private with Regions.Contexts;
+with Regions.Contexts;
+pragma Warnings (Off);
+with Regions.Environments;
+pragma Warnings (On);
 
 package Regions.Entities.Roots is
    pragma Preelaborate;
@@ -21,8 +24,14 @@ private
    end record;
 
    overriding function Has_Region (Self : Root_Entity) return Boolean
-     is (False);
-   --  To pretend that root region doesn't have a corresponding entity
+     is (True);
+   --  ??? root region doesn't have a corresponding entity
+
+   overriding procedure Insert
+     (Self   : in out Root_Entity;
+      Symbol : Regions.Symbol;
+      Entity : Entity_Access;
+      Name   : out Regions.Contexts.Selected_Entity_Name);
 
    overriding function Immediate_Visible
      (Self   : Root_Entity;
@@ -30,8 +39,9 @@ private
        (if Symbol = Self.Standard
         then (1 => Get_Entity
                      (Self.Env,
-                      Context.New_Selected_Name
-                        (Context.Root_Name, Context.New_Entity_Name (Symbol))))
+                      Self.Env.Context.New_Selected_Name
+                        (Self.Env.Context.Root_Name,
+                         Self.Env.Context.New_Entity_Name (Symbol))))
         else (1 .. 0 => null));
 
 end Regions.Entities.Roots;
