@@ -50,4 +50,10 @@ private
      (Self   : Package_Entity;
       Symbol : Regions.Symbol) return Entity_Access_Array;
 
+   overriding procedure Insert
+     (Self   : in out Package_Entity;
+      Symbol : Regions.Symbol;
+      Parent : Regions.Contexts.Selected_Entity_Name;
+      Name   : out Regions.Contexts.Selected_Entity_Name);
+
 end Regions.Entities.Packages;

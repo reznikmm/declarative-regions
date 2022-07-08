@@ -24,12 +24,16 @@ package body Regions.Entities.Roots is
    overriding procedure Insert
      (Self   : in out Root_Entity;
       Symbol : Regions.Symbol;
-      Entity : Entity_Access;
-      Name   : out Regions.Contexts.Selected_Entity_Name) is
+      Parent : Regions.Contexts.Selected_Entity_Name;
+      Name   : out Regions.Contexts.Selected_Entity_Name)
+   is
+      use type Regions.Contexts.Selected_Entity_Name;
    begin
       if Symbol = Self.Standard then
+         pragma Assert (Parent = Self.Env.Context.Root_Name);
+
          Name := Self.Env.Context.New_Selected_Name
-           (Self.Env.Context.Root_Name,
+           (Parent,
             Self.Env.Context.New_Entity_Name (Symbol));
       else
          raise Program_Error;

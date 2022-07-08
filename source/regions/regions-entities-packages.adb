@@ -3,6 +3,10 @@
 --  SPDX-License-Identifier: Apache-2.0
 -------------------------------------------------------------
 
+pragma Warnings (Off);
+with Regions.Environments;
+pragma Warnings (On);
+
 package body Regions.Entities.Packages is
 
    ------------
@@ -13,10 +17,9 @@ package body Regions.Entities.Packages is
      (Env    : Environment_Access;
       Symbol : Regions.Symbol) return Entity'Class
    is
-      pragma Unreferenced (Symbol);
    begin
       return Result : Package_Entity (Env) do
-         null;
+         Result.Symbol := Symbol;
       end return;
    end Create;
 
@@ -47,5 +50,28 @@ package body Regions.Entities.Packages is
          return (1 .. 0 => null);
       end if;
    end Immediate_Visible;
+
+   ------------
+   -- Insert --
+   ------------
+
+   overriding procedure Insert
+     (Self   : in out Package_Entity;
+      Symbol : Regions.Symbol;
+      Parent : Regions.Contexts.Selected_Entity_Name;
+      Name   : out Regions.Contexts.Selected_Entity_Name)
+   is
+      List : Entity_Name_Lists.List;
+   begin
+      Name := Self.Env.Context.New_Selected_Name
+        (Parent, Self.Env.Context.New_Entity_Name (Symbol));
+
+      if Self.Names.Contains (Symbol) then
+         List := Self.Names.Element (Symbol);
+      end if;
+
+      List.Prepend (Name);
+      Self.Names.Insert (Symbol, List);
+   end Insert;
 
 end Regions.Entities.Packages;

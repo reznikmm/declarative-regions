@@ -3,6 +3,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 -------------------------------------------------------------
 
+with Regions.Contexts;
 with Regions.Entities;
 with Regions.Environments.Get_Entity;
 
@@ -44,5 +45,18 @@ package body Regions is
          return (1 .. 0 => null);
       end if;
    end Immediate_Visible;
+
+   ------------
+   -- Insert --
+   ------------
+
+   not overriding procedure Insert
+     (Self   : in out Region;
+      Symbol : Regions.Symbol;
+      Parent : Regions.Contexts.Selected_Entity_Name;
+      Name   : out Regions.Contexts.Selected_Entity_Name) is
+   begin
+      raise Program_Error;  --  Should be overrided
+   end Insert;
 
 end Regions;

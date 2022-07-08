@@ -33,7 +33,7 @@ private
    overriding procedure Insert
      (Self   : in out Embedded_Region;
       Symbol : Regions.Symbol;
-      Entity : Entity_Access;
+      Parent : Regions.Contexts.Selected_Entity_Name;
       Name   : out Regions.Contexts.Selected_Entity_Name);
 
    type Entity (Env : not null Environment_Access) is abstract tagged limited
@@ -44,8 +44,8 @@ private
    not overriding procedure Insert
      (Self   : in out Entity;
       Symbol : Regions.Symbol;
-      Entity : Entity_Access;
-      Name   : out Regions.Contexts.Selected_Entity_Name) is null;
+      Parent : Regions.Contexts.Selected_Entity_Name;
+      Name   : out Regions.Contexts.Selected_Entity_Name);
    --  I want it to be abstract
 
    function Region (Self : in out Entity'Class) return Region_Access is

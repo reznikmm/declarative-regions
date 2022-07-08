@@ -21,16 +21,19 @@ package body Regions.Environments.Factory is
         new Regions.Entities.Entity'Class'
           (Regions.Entities.Packages.Create (Self'Unchecked_Access, Symbol));
 
-      Id     : constant Regions.Contexts.Selected_Entity_Name :=
-        Entity_Name_Lists.First_Element (Self.Nested);
-
-      Parent : constant Entity_Access :=
-        Get_Entity (Self'Unchecked_Access, Id);
-
       Name : Regions.Contexts.Selected_Entity_Name;
    begin
-      --  Insert Entity into environment
-      Parent.Region.Insert (Symbol, Entity, Name);
+      declare
+         Id : constant Regions.Contexts.Selected_Entity_Name :=
+           Entity_Name_Lists.First_Element (Self.Nested);
+
+         --  Insert Entity into environment can change Parent :(
+         Parent : constant Entity_Access :=
+           Get_Entity (Self'Unchecked_Access, Id);
+      begin
+         Parent.Region.Insert (Symbol, Id, Name);
+      end;
+
       Self.Entity_Map.Insert (Name, Entity);
       Self.Nested.Prepend (Name);
    end Create_Package;

@@ -47,8 +47,9 @@ private
    not overriding procedure Insert
      (Self   : in out Region;
       Symbol : Regions.Symbol;
-      Entity : Entity_Access;
-      Name   : out Regions.Contexts.Selected_Entity_Name) is null;
+      Parent : Regions.Contexts.Selected_Entity_Name;
+      Name   : out Regions.Contexts.Selected_Entity_Name);
+   --  Create Name from Parent name and symbol and insert it into the Region.
    --  I want it to be abstract :(
 
    function Get_Entity

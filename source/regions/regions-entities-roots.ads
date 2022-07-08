@@ -30,7 +30,7 @@ private
    overriding procedure Insert
      (Self   : in out Root_Entity;
       Symbol : Regions.Symbol;
-      Entity : Entity_Access;
+      Parent : Regions.Contexts.Selected_Entity_Name;
       Name   : out Regions.Contexts.Selected_Entity_Name);
 
    overriding function Immediate_Visible
