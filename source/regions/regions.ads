@@ -18,6 +18,8 @@ package Regions is
    type Environment_Access is
      access all Regions.Environments.Environment'Class;
 
+   type Snapshot_Access is access all Regions.Environments.Snapshot'Class;
+
    type Context_Access is access all Regions.Contexts.Context'Class
      with Storage_Size => 0;
 
@@ -37,12 +39,20 @@ package Regions is
    --  Return Entity corresponding to the region or null if region isn't an
    --  entity.
 
+   procedure Initialize;
+
 private
 
    type Change_Count is mod 2 ** 32;
 
-   type Region (Entity : Entity_Access := null) is
-     abstract tagged limited null record;
+   Version : aliased Change_Count := 1;
+   --  Environment map version
+
+   --  type Region (Entity : Entity_Access := null) is
+   --    abstract tagged limited null record;
+   type Region is abstract tagged limited record
+      Entity : Entity_Access;
+   end record;
 
    not overriding procedure Insert
      (Self   : in out Region;
@@ -55,5 +65,12 @@ private
    function Get_Entity
      (Env  : Environment_Access;
       Name : Regions.Contexts.Selected_Entity_Name) return Entity_Access;
+
+   function Get_For_Update
+     (Env  : Environment_Access;
+      Name : Regions.Contexts.Selected_Entity_Name) return Entity_Access;
+
+   Clone : access function (Self : Regions.Entities.Entity'Class)
+     return Entity_Access;
 
 end Regions;

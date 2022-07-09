@@ -23,6 +23,9 @@ package Regions.Shared_Lists is
    function First_Element (Self : List) return Element_Type
      with Pre => not Self.Is_Empty, Inline;
 
+   function Tail (Self : List'Class) return List
+     with Pre => not Self.Is_Empty, Inline;
+
    procedure Prepend
      (Self : in out List;
       Item : Element_Type) with Inline;

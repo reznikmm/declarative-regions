@@ -55,4 +55,41 @@ package body Regions.Environments.Factory is
       Self.Nested.Prepend (Self.Context.Root_Name);
    end Initialize;
 
+   ------------------
+   -- Leave_Region --
+   ------------------
+
+   procedure Leave_Region (Self : in out Environment) is
+   begin
+      Self.Nested := Self.Nested.Tail;
+   end Leave_Region;
+
+   -------------------
+   -- Load_Snapshot --
+   -------------------
+
+   procedure Load_Snapshot
+     (Self  : in out Environment;
+      Value : Snapshot'Class) is
+   begin
+      Self.Entity_Map := Value.Entity_Map;
+      Self.Nested := Value.Nested;
+   end Load_Snapshot;
+
+   -------------------
+   -- Make_Snapshot --
+   -------------------
+
+   function Make_Snapshot
+     (Self : Environment) return not null Snapshot_Access is
+   begin
+      return Result : constant not null Snapshot_Access :=
+        new Snapshot (Self.Context)
+      do
+         Version := Version + 1;  --  Freeze Entity_Map update
+         Result.Entity_Map := Self.Entity_Map;
+         Result.Nested := Self.Nested;
+      end return;
+   end Make_Snapshot;
+
 end Regions.Environments.Factory;

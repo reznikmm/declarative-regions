@@ -5,7 +5,7 @@
 
 with Regions.Contexts;
 with Regions.Entities;
-with Regions.Environments.Get_Entity;
+with Regions.Environments.Internal;
 
 package body Regions is
 
@@ -28,7 +28,12 @@ package body Regions is
    function Get_Entity
      (Env  : Environment_Access;
       Name : Regions.Contexts.Selected_Entity_Name) return Entity_Access is
-        (Regions.Environments.Get_Entity (Env.all, Name));
+        (Regions.Environments.Internal.Get_Entity (Env.all, Name));
+
+   function Get_For_Update
+     (Env  : Environment_Access;
+      Name : Regions.Contexts.Selected_Entity_Name) return Entity_Access is
+        (Regions.Environments.Internal.Get_For_Update (Env.all, Name));
 
    -----------------------
    -- Immediate_Visible --
@@ -45,6 +50,15 @@ package body Regions is
          return (1 .. 0 => null);
       end if;
    end Immediate_Visible;
+
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize is
+   begin
+      Regions.Entities.Initialize;
+   end Initialize;
 
    ------------
    -- Insert --

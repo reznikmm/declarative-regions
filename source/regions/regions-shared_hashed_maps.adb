@@ -325,6 +325,42 @@ package body Regions.Shared_Hashed_Maps is
       Descent (Self.Root, 0);
    end Insert;
 
+   ---------------
+   -- Is_Shared --
+   ---------------
+
+   function Is_Shared (Self : Map; Key : Key_Type) return Boolean is
+      Key_Hash : constant Hash_Type := Hash (Key);
+      Mask     : constant Hash_Type := Hash_Type (Branches - 1);
+      Next     : Node_Access := Self.Root;
+      Rest     : Hash_Type := Key_Hash;
+   begin
+      if Self.Root.Counter > 1 then
+         return True;
+      end if;
+
+      while Next /= null loop
+         if Next.Version /= Self.Active.all then
+            return True;
+         elsif Next.Length > 0 then
+            declare
+               Bit : constant Bit_Index := Bit_Index (Rest and Mask);
+            begin
+               if (Next.Mask and 2 ** Bit) = 0 then
+                  return True;
+               else
+                  Next := Next.Child (Pop_Count (Next.Mask, Bit));
+                  Rest := Rest / Branches;
+               end if;
+            end;
+         else
+            return False;
+         end if;
+      end loop;
+
+      return True;
+   end Is_Shared;
+
    -------------
    -- Iterate --
    -------------
@@ -492,7 +528,7 @@ package body Regions.Shared_Hashed_Maps is
 
          if Changed
            or Next.Counter > 1
-           or Next.Version = Self.Active.all
+           or Next.Version /= Self.Active.all
          then
             Changed := True;
             Next := new Node'(Next.all);

@@ -7,6 +7,18 @@ with Regions.Contexts;
 
 package body Regions.Entities is
 
+   function Clone (Self : Entity'Class) return Entity_Access is
+      (new Entity'Class'(Self.Clone));
+
+   ----------------
+   -- Initialize --
+   ----------------
+
+   procedure Initialize is
+   begin
+      Regions.Clone := Clone'Access;
+   end Initialize;
+
    ------------
    -- Insert --
    ------------

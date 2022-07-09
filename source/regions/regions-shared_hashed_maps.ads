@@ -40,6 +40,10 @@ package Regions.Shared_Hashed_Maps is
    function Element (Self : Map; Key : Key_Type) return Element_Type;
    --  Return item by key
 
+   function Is_Shared (Self : Map; Key : Key_Type) return Boolean;
+   --  with Pre => Self.Contains (Key)
+   --  Return True if Self.Insert (Key, ...) witll create a copy of value
+
    type Cursor is private;
 
    function Has_Element (Self : Cursor) return Boolean;
@@ -91,8 +95,8 @@ private
    type Node_Access_Array is array (Bit_Count range <>) of Node_Access;
 
    type Node (Length : Bit_Count) is record
-      Version : Change_Count;
-      Counter : Natural;
+      Version : Change_Count;  --  Parent.Vertion >= Child.Version
+      Counter : Natural;       --  Parent.Count?
 
       case Length is
          when 0 =>

@@ -56,4 +56,6 @@ private
       Parent : Regions.Contexts.Selected_Entity_Name;
       Name   : out Regions.Contexts.Selected_Entity_Name);
 
+   overriding function Clone (Self : Package_Entity) return Entity'Class;
+
 end Regions.Entities.Packages;

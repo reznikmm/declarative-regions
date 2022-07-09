@@ -26,6 +26,8 @@ package Regions.Entities is
    function Region (Self : in out Entity'Class) return Region_Access
      with Pre => Self.Has_Region;
 
+   procedure Initialize;
+
 private
 
    type Embedded_Region is new Regions.Region with null record;
@@ -38,7 +40,7 @@ private
 
    type Entity (Env : not null Environment_Access) is abstract tagged limited
    record
-      Region : aliased Embedded_Region (Entity'Unchecked_Access);
+      Region : aliased Embedded_Region := (Entity => Entity'Unchecked_Access);
    end record;
 
    not overriding procedure Insert
@@ -47,6 +49,9 @@ private
       Parent : Regions.Contexts.Selected_Entity_Name;
       Name   : out Regions.Contexts.Selected_Entity_Name);
    --  I want it to be abstract
+
+   not overriding function Clone (Self : Entity) return Entity'Class is
+      (raise Program_Error);
 
    function Region (Self : in out Entity'Class) return Region_Access is
       (Self.Region'Unchecked_Access);

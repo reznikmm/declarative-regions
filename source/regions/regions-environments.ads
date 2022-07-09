@@ -19,6 +19,8 @@ package Regions.Environments is
    function Nested_Regions (Self : Environment'Class)
      return Regions.Region_Access_Array;
 
+   type Snapshot (Context : Context_Access) is tagged limited private;
+
 private
 
    procedure Free is new Ada.Unchecked_Deallocation
@@ -38,8 +40,6 @@ private
      (Regions.Contexts.Selected_Entity_Name,
       Regions.Contexts."=");
 
-   Version : aliased Change_Count := 1;
-
    type Environment (Context : Context_Access) is
    tagged limited record
       Entity_Map : Entity_Maps.Map :=
@@ -48,5 +48,8 @@ private
       Nested     : Entity_Name_Lists.List;
       --  Selected entity name list for each nested region
    end record;
+
+   type Snapshot (Context : Context_Access) is
+     new Environment (Context) with null record;
 
 end Regions.Environments;

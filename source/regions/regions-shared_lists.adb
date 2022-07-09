@@ -158,6 +158,20 @@ package body Regions.Shared_Lists is
       Self.Counter := Self.Counter + 1;
    end Reference;
 
+   ----------
+   -- Tail --
+   ----------
+
+   function Tail (Self : List'Class) return List is
+      Node : constant List_Node_Access := Self.Head.Next;
+   begin
+      if Node /= null then
+         Reference (Node);
+      end if;
+
+      return (Ada.Finalization.Controlled with Node, Self.Length - 1);
+   end Tail;
+
    -----------------
    -- Unreference --
    -----------------

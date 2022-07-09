@@ -9,6 +9,22 @@ pragma Warnings (On);
 
 package body Regions.Entities.Packages is
 
+   -----------
+   -- Clone --
+   -----------
+
+   overriding function Clone (Self : Package_Entity) return Entity'Class is
+   begin
+      return Result : Package_Entity :=
+        (Env    => Self.Env,
+         Symbol => Self.Symbol,
+         Names  => Self.Names,
+         Region => (Entity => null))
+      do
+         Result.Region.Entity := Result'Unchecked_Access;
+      end return;
+   end Clone;
+
    ------------
    -- Create --
    ------------
