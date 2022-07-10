@@ -10,7 +10,7 @@ package body Regions.Shared_Hashed_Maps is
    function Pop_Count (Value : Unsigned_64; Bit : Bit_Index) return Bit_Count;
    --  Count 1 bits in Value (0 .. Bit)
 
-   procedure Reference (Self : not null Node_Access) with Inline;
+   procedure Reference (Self : Node_Access) with Inline;
    procedure Unreference (Self : in out Node_Access) with Inline;
 
    function Descend (Path : Node_Access_Array) return Cursor;
@@ -56,9 +56,7 @@ package body Regions.Shared_Hashed_Maps is
 
    overriding procedure Adjust (Self : in out Map) is
    begin
-      if Self.Root /= null then
-         Reference (Self.Root);
-      end if;
+      Reference (Self.Root);
    end Adjust;
 
    -----------------------
@@ -451,9 +449,11 @@ package body Regions.Shared_Hashed_Maps is
    -- Reference --
    ---------------
 
-   procedure Reference (Self : not null Node_Access) is
+   procedure Reference (Self : Node_Access) is
    begin
-      Self.Counter := Self.Counter + 1;
+      if Self /= null then
+         Self.Counter := Self.Counter + 1;
+      end if;
    end Reference;
 
    ----------------
@@ -481,6 +481,268 @@ package body Regions.Shared_Hashed_Maps is
    begin
       return Index;
    end To_Index;
+
+   -----------
+   -- Union --
+   -----------
+
+   function Union (Left, Right : Map'Class) return Map is
+      procedure Descent
+        (Parent : out Node_Access;
+         L, R   : Node_Access;
+         Shift  : Bit_Count);
+
+      procedure Descent
+        (Parent : out Node_Access;
+         L, R   : Node_Access;
+         Shift  : Bit_Count)
+      is
+         Mask : constant Hash_Type := Hash_Type (Branches - 1);
+      begin
+         if L = R or R = null then
+            Parent := L;
+            Reference (Parent);
+         elsif L = null then
+            Parent := R;
+            Reference (Parent);
+         elsif L.Version = R.Version then
+            Parent := L;
+            Reference (Parent);
+         elsif L.Length = 0 and R.Length = 0 then
+            if L.Hash = R.Hash then
+               Parent := (if L.Version > R.Version then L else R);
+               Reference (Parent);
+            else
+               declare
+                  L_Suf : constant Hash_Type := L.Hash / 2 ** Shift;
+                  L_Bit : constant Bit_Index := Bit_Index (L_Suf and Mask);
+                  R_Suf : constant Hash_Type := R.Hash / 2 ** Shift;
+                  R_Bit : constant Bit_Index := Bit_Index (R_Suf and Mask);
+               begin
+                  if L_Bit = R_Bit then
+                     Parent := new Node (Length => 1);
+                     Parent.Version := Change_Count'Max (L.Version, R.Version);
+                     Parent.Counter := 1;
+                     Parent.Mask := 2 ** L_Bit;
+                     Descent (Parent.Child (1), L, R, Shift + Slit_Bits);
+                  else
+                     Parent := new Node (Length => 2);
+                     Reference (L);
+                     Reference (R);
+
+                     Parent.Version := Change_Count'Max (L.Version, R.Version);
+                     Parent.Counter := 1;
+                     Parent.Mask := 2 ** L_Bit or 2 ** R_Bit;
+                     Parent.Child :=
+                       (if L_Bit < R_Bit then (L, R) else (R, L));
+                  end if;
+               end;
+            end if;
+         elsif R.Length = 0 then
+            Descent (Parent, L => R, R => L, Shift => Shift);
+         elsif L.Length = 0 then
+            declare
+               L_Suffix : constant Hash_Type := L.Hash / 2 ** Shift;
+               L_Bit    : constant Bit_Index := Bit_Index (L_Suffix and Mask);
+               Index    : constant Bit_Count := Pop_Count (R.Mask, L_Bit);
+            begin
+               if (R.Mask and 2 ** L_Bit) = 0 then  --  No L in R
+                  Parent := new Node (Length => R.Length + 1);
+
+                  Reference (L);
+
+                  for Child of R.Child loop
+                     Reference (Child);
+                  end loop;
+
+                  Parent.Version := Change_Count'Max (L.Version, R.Version);
+                  Parent.Counter := 1;
+                  Parent.Mask := R.Mask or 2 ** L_Bit;
+                  Parent.Child (1 .. Index) := R.Child (1 .. Index);
+                  Parent.Child (Index + 1) := L;
+                  Parent.Child (Index + 2 .. Parent.Length) :=
+                    R.Child (Index + 1 .. R.Length);
+               else
+                  declare
+                     Child : Node_Access;
+                  begin
+                     pragma Assert (Index > 0);  --  because bit in mask
+                     Descent (Child, L, R.Child (Index), Shift);
+
+                     if Child = R.Child (Index) then  --  Reuse R
+                        Unreference (Child);
+                        Parent := R;
+                        Reference (Parent);
+                     else  --  L was changed in R
+                        Parent := new Node (Length => R.Length);
+
+                        for Child of R.Child loop
+                           Reference (Child);
+                        end loop;
+
+                        Parent.Version :=
+                          Change_Count'Max (L.Version, R.Version);
+                        Parent.Counter := 1;
+                        Parent.Mask := R.Mask;
+                        Parent.Child := R.Child;
+                        Unreference (Parent.Child (Index));
+                        Parent.Child (Index) := Child;
+                     end if;
+                  end;
+               end if;
+            end;
+         elsif L.Mask = R.Mask then
+            declare
+               Child : Node_Access_Array (1 .. L.Length);
+            begin
+               for J in 1 .. L.Length loop
+                  Descent
+                    (Child (J),
+                     L.Child (J),
+                     R.Child (J),
+                     Shift + Slit_Bits);
+               end loop;
+
+               if L.Child = Child then
+                  Parent := L;  --  Reuse L
+
+                  for X of Child loop
+                     Unreference (X);
+                  end loop;
+
+                  Reference (Parent);
+               elsif R.Child = Child then
+                  Parent := R;  --  Reuse R
+
+                  for X of Child loop
+                     Unreference (X);
+                  end loop;
+
+                  Reference (Parent);
+               else  --  Can't reuse L,R
+                  Parent := new Node (Length => L.Length);
+
+                  Parent.Version := Change_Count'Max (L.Version, R.Version);
+                  Parent.Counter := 1;
+                  Parent.Mask := R.Mask;
+                  Parent.Child := Child;
+               end if;
+            end;
+         elsif R.Mask = (L.Mask or R.Mask) then
+            Descent (Parent, L => R, R => L, Shift => Shift);
+         elsif L.Mask = (L.Mask or R.Mask) then
+            declare
+               Child  : Node_Access_Array (1 .. L.Length);
+               L_Mask : Unsigned_64 := L.Mask;
+               R_Mask : Unsigned_64 := R.Mask;
+               Index  : Bit_Count := 1;
+            begin
+               for J in 1 .. L.Length loop
+                  while (L_Mask and 1) = 0 loop
+                     L_Mask := L_Mask / 2;
+                     R_Mask := R_Mask / 2;
+                  end loop;
+
+                  if (R_Mask and 1) = 0 then
+                     Descent
+                       (Child (J),
+                        L.Child (J),
+                        null,
+                        Shift + Slit_Bits);
+                  else
+                     Descent
+                       (Child (J),
+                        L.Child (J),
+                        R.Child (Index),
+                        Shift + Slit_Bits);
+
+                     Index := Index + 1;
+                  end if;
+
+                  L_Mask := L_Mask / 2;
+                  R_Mask := R_Mask / 2;
+               end loop;
+
+               if L.Child = Child then  --  Reuse L
+                  for X of Child loop
+                     Unreference (X);
+                  end loop;
+
+                  Parent := L;
+                  Reference (Parent);
+               else  --  Can't reuse L
+                  Parent := new Node (Length => L.Length);
+
+                  Parent.Version := Change_Count'Max (L.Version, R.Version);
+                  Parent.Counter := 1;
+                  Parent.Mask := L.Mask;
+                  Parent.Child := Child;
+               end if;
+            end;
+         else
+            declare
+               Mask   : constant Unsigned_64 := L.Mask or R.Mask;
+               Total  : constant Bit_Count := Pop_Count (Mask, Bit_Index'Last);
+               L_Mask : Unsigned_64 := L.Mask;
+               R_Mask : Unsigned_64 := R.Mask;
+               Index  : Bit_Count := 1;
+               L_Ind  : Bit_Count := 1;
+               R_Ind  : Bit_Count := 1;
+            begin
+               Parent := new Node (Length => Total);
+
+               while L_Mask /= 0 or R_Mask /= 0 loop
+                  while (L_Mask and 1) = 0 and (R_Mask and 1) = 0 loop
+                     L_Mask := L_Mask / 2;
+                     R_Mask := R_Mask / 2;
+                  end loop;
+
+                  if (R_Mask and 1) = 0 then
+                     Descent
+                       (Parent.Child (Index),
+                        L.Child (L_Ind),
+                        null,
+                        Shift + Slit_Bits);
+                     L_Ind := L_Ind + 1;
+                     Index := Index + 1;
+                  elsif (L_Mask and 1) = 0 then
+                     Descent
+                       (Parent.Child (Index),
+                        null,
+                        R.Child (R_Ind),
+                        Shift + Slit_Bits);
+                     R_Ind := R_Ind + 1;
+                     Index := Index + 1;
+                  else
+                     Descent
+                       (Parent.Child (Index),
+                        L.Child (L_Ind),
+                        R.Child (R_Ind),
+                        Shift + Slit_Bits);
+
+                     L_Ind := L_Ind + 1;
+                     R_Ind := R_Ind + 1;
+                     Index := Index + 1;
+                  end if;
+
+                  L_Mask := L_Mask / 2;
+                  R_Mask := R_Mask / 2;
+               end loop;
+
+               Parent.Version := Change_Count'Max (L.Version, R.Version);
+               Parent.Counter := 1;
+               Parent.Mask := Mask;
+            end;
+         end if;
+      end Descent;
+
+   begin
+      return Result : Map :=
+        (Ada.Finalization.Controlled with Left.Active, null)
+      do
+         Descent (Result.Root, Left.Root, Right.Root, 0);
+      end return;
+   end Union;
 
    -----------------
    -- Unreference --

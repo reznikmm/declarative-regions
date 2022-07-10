@@ -92,4 +92,15 @@ package body Regions.Environments.Factory is
       end return;
    end Make_Snapshot;
 
+   -------------------
+   -- With_Snapshot --
+   -------------------
+
+   procedure With_Snapshot
+     (Self  : in out Environment;
+      Value : Snapshot'Class) is
+   begin
+      null;
+   end With_Snapshot;
+
 end Regions.Environments.Factory;

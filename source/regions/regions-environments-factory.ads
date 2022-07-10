@@ -18,6 +18,12 @@ package Regions.Environments.Factory is
       Value : Snapshot'Class);
    --  Discard current environment and replace it with given snapshot
 
+   procedure With_Snapshot
+     (Self  : in out Environment;
+      Value : Snapshot'Class);
+   --  Merge given snapshot into current environment. Don't change nested
+   --  region stack
+
    procedure Create_Package
      (Self   : in out Environment;
       Symbol : Regions.Symbol);
@@ -25,4 +31,5 @@ package Regions.Environments.Factory is
 
    procedure Leave_Region (Self : in out Environment);
    --  Pop a toppest region from the nested region stack
+
 end Regions.Environments.Factory;

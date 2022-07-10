@@ -44,6 +44,10 @@ package Regions.Shared_Hashed_Maps is
    --  with Pre => Self.Contains (Key)
    --  Return True if Self.Insert (Key, ...) witll create a copy of value
 
+   function Union (Left, Right : Map'Class) return Map;
+   --  Merge all elements of Left and Right. For elements presented in both
+   --  maps, keep an element with greater change count.
+
    type Cursor is private;
 
    function Has_Element (Self : Cursor) return Boolean;
