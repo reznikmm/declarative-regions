@@ -16,6 +16,10 @@ package Regions.Entities is
      is abstract;
    --  Check if the entity has a corresponding declarative region
 
+   not overriding function Is_Overloadable (Self : Entity) return Boolean
+     is abstract;
+   --  Check if overloading is allowed for the entity
+
    not overriding function Immediate_Visible
      (Self   : Entity;
       Symbol : Regions.Symbol) return Entity_Access_Array is abstract;
@@ -25,6 +29,14 @@ package Regions.Entities is
 
    function Region (Self : in out Entity'Class) return Region_Access
      with Pre => Self.Has_Region;
+
+   type Entity_Kind is
+     (An_Enumeration_Type,
+      An_Enumeration_Literal,
+      A_Package);
+
+   not overriding function Kind (Self : Entity) return Entity_Kind
+     is abstract;
 
    procedure Initialize;
 

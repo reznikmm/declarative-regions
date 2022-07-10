@@ -23,9 +23,15 @@ private
       Standard : Symbol;
    end record;
 
+   overriding function Kind (Self : Root_Entity) return Entity_Kind
+     is (A_Package);   --  ???
+
    overriding function Has_Region (Self : Root_Entity) return Boolean
      is (True);
    --  ??? root region doesn't have a corresponding entity
+
+   overriding function Is_Overloadable (Self : Root_Entity) return Boolean
+     is (False);
 
    overriding procedure Insert
      (Self   : in out Root_Entity;

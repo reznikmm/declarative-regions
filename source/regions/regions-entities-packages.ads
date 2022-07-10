@@ -14,9 +14,7 @@ package Regions.Entities.Packages is
 
    type Package_Entity is new Entity with private;
 
-   function Create
-     (Env    : Environment_Access;
-      Symbol : Regions.Symbol) return Entity'Class with Inline;
+   function Create (Env : Environment_Access) return Entity'Class with Inline;
 
 private
 
@@ -39,12 +37,17 @@ private
    Package_Version : aliased Change_Count := 0;
 
    type Package_Entity is new Entity with record
-      Symbol : Regions.Symbol;
       Names  : Name_Maps.Map := Name_Maps.Empty_Map (Package_Version'Access);
    end record;
 
+   overriding function Kind (Self : Package_Entity) return Entity_Kind
+     is (A_Package);
+
    overriding function Has_Region (Self : Package_Entity) return Boolean
      is (True);
+
+   overriding function Is_Overloadable (Self : Package_Entity) return Boolean
+     is (False);
 
    overriding function Immediate_Visible
      (Self   : Package_Entity;

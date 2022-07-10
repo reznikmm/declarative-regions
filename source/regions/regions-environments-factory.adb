@@ -3,11 +3,58 @@
 --  SPDX-License-Identifier: Apache-2.0
 -------------------------------------------------------------
 
-with Regions.Entities.Roots;
-with Regions.Entities.Packages;
 with Regions.Contexts;
+with Regions.Entities.Enumeration_Types;
+with Regions.Entities.Enumeration_Literals;
+with Regions.Entities.Packages;
+with Regions.Entities.Roots;
 
 package body Regions.Environments.Factory is
+
+   -----------------------------
+   -- Create_Enumeration_Type --
+   -----------------------------
+
+   procedure Create_Enumeration_Type
+     (Self     : in out Environment;
+      Symbol   : Regions.Symbol;
+      Literals : Regions.Symbol_Array)
+   is
+      Id : constant Regions.Contexts.Selected_Entity_Name :=
+        Entity_Name_Lists.First_Element (Self.Nested);
+
+      Type_Name : Regions.Contexts.Selected_Entity_Name;
+   begin
+      declare
+         Entity : constant Entity_Access := new Regions.Entities.Entity'Class'
+           (Regions.Entities.Enumeration_Types.Create (Self'Unchecked_Access));
+
+         --  Insert Entity into environment can change Parent :(
+         Parent : constant Entity_Access :=
+           Get_Entity (Self'Unchecked_Access, Id);
+      begin
+         Parent.Region.Insert (Symbol, Id, Type_Name);
+         Self.Entity_Map.Insert (Type_Name, Entity);
+      end;
+
+      for S of Literals loop
+         declare
+            Entity : constant Entity_Access :=
+              new Regions.Entities.Entity'Class'
+                (Regions.Entities.Enumeration_Literals.Create
+                   (Self'Unchecked_Access, Type_Name));
+
+            Name : Regions.Contexts.Selected_Entity_Name;
+
+            --  Insert Entity into environment can change Parent :(
+            Parent : constant Entity_Access :=
+              Get_Entity (Self'Unchecked_Access, Id);
+         begin
+            Parent.Region.Insert (S, Id, Name);
+            Self.Entity_Map.Insert (Name, Entity);
+         end;
+      end loop;
+   end Create_Enumeration_Type;
 
    --------------------
    -- Create_Package --
@@ -19,7 +66,7 @@ package body Regions.Environments.Factory is
    is
       Entity : constant Entity_Access :=
         new Regions.Entities.Entity'Class'
-          (Regions.Entities.Packages.Create (Self'Unchecked_Access, Symbol));
+          (Regions.Entities.Packages.Create (Self'Unchecked_Access));
 
       Name : Regions.Contexts.Selected_Entity_Name;
    begin
@@ -72,6 +119,7 @@ package body Regions.Environments.Factory is
      (Self  : in out Environment;
       Value : Snapshot'Class) is
    begin
+      Version := Version + 1;
       Self.Entity_Map := Value.Entity_Map;
       Self.Nested := Value.Nested;
    end Load_Snapshot;
@@ -100,7 +148,8 @@ package body Regions.Environments.Factory is
      (Self  : in out Environment;
       Value : Snapshot'Class) is
    begin
-      null;
+      Version := Version + 1;
+      Self.Entity_Map := Self.Entity_Map.Union (Value.Entity_Map);
    end With_Snapshot;
 
 end Regions.Environments.Factory;

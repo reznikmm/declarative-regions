@@ -11,6 +11,9 @@ package Regions is
    pragma Preelaborate;
 
    type Symbol is mod 2 ** 32;
+   --  First 16#11_0000# symbols are reserved for characters
+
+   type Symbol_Array is array (Positive range <>) of Symbol;
 
    type Entity_Access is access all Regions.Entities.Entity'Class;
    type Entity_Access_Array is array (Positive range <>) of Entity_Access;

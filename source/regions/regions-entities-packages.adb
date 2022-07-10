@@ -17,7 +17,6 @@ package body Regions.Entities.Packages is
    begin
       return Result : Package_Entity :=
         (Env    => Self.Env,
-         Symbol => Self.Symbol,
          Names  => Self.Names,
          Region => (Entity => null))
       do
@@ -29,13 +28,10 @@ package body Regions.Entities.Packages is
    -- Create --
    ------------
 
-   function Create
-     (Env    : Environment_Access;
-      Symbol : Regions.Symbol) return Entity'Class
-   is
+   function Create (Env : Environment_Access) return Entity'Class is
    begin
       return Result : Package_Entity (Env) do
-         Result.Symbol := Symbol;
+         Result.Region.Entity := Result'Unchecked_Access;
       end return;
    end Create;
 

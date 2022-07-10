@@ -32,4 +32,10 @@ package Regions.Environments.Factory is
    procedure Leave_Region (Self : in out Environment);
    --  Pop a toppest region from the nested region stack
 
+   procedure Create_Enumeration_Type
+     (Self     : in out Environment;
+      Symbol   : Regions.Symbol;
+      Literals : Regions.Symbol_Array);
+   --  Create enumeration type and corresponding literals. No new region
+
 end Regions.Environments.Factory;
