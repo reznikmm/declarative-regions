@@ -1,3 +1,8 @@
+--  SPDX-FileCopyrightText: 2022 Max Reznik <reznikmm@gmail.com>
+--
+--  SPDX-License-Identifier: MIT
+-------------------------------------------------------------
+
 with Regions.Shared_Hashed_Maps;
 
 procedure Union_Test is

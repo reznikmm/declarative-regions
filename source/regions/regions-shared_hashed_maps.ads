@@ -1,3 +1,8 @@
+--  SPDX-FileCopyrightText: 2022 Max Reznik <reznikmm@gmail.com>
+--
+--  SPDX-License-Identifier: MIT
+-------------------------------------------------------------
+
 with Ada.Finalization;
 with Ada.Iterator_Interfaces;
 
