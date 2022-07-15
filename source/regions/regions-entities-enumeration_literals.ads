@@ -3,7 +3,7 @@
 --  SPDX-License-Identifier: Apache-2.0
 -------------------------------------------------------------
 
-with Regions.Contexts;
+private with Regions.Contexts;
 
 package Regions.Entities.Enumeration_Literals is
 

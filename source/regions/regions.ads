@@ -76,4 +76,8 @@ private
    Clone : access function (Self : Regions.Entities.Entity'Class)
      return Entity_Access;
 
+   Set_Name : access procedure
+     (Self : in out Regions.Entities.Entity'Class;
+      Name : Regions.Contexts.Selected_Entity_Name);
+
 end Regions;

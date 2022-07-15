@@ -43,4 +43,10 @@ package Regions.Environments.Factory is
       Symbol   : Regions.Symbol);
    --  Create signed integer type. No new region
 
+   procedure Create_Subtype
+     (Self         : in out Environment;
+      Symbol       : Regions.Symbol;
+      Subtype_Mark : Regions.Entity_Access);
+   --  Create subtype with given subtype mark. No new region
+
 end Regions.Environments.Factory;

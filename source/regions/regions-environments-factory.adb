@@ -9,6 +9,7 @@ with Regions.Entities.Enumeration_Literals;
 with Regions.Entities.Packages;
 with Regions.Entities.Roots;
 with Regions.Entities.Signed_Integer_Types;
+with Regions.Entities.Subtypes;
 
 package body Regions.Environments.Factory is
 
@@ -36,6 +37,7 @@ package body Regions.Environments.Factory is
       begin
          Parent.Region.Insert (Symbol, Parent_Id, Type_Name);
          Self.Entity_Map.Insert (Type_Name, Entity);
+         Set_Name (Entity.all, Type_Name);
       end;
 
       for S of Literals loop
@@ -53,6 +55,7 @@ package body Regions.Environments.Factory is
          begin
             Parent.Region.Insert (S, Parent_Id, Name);
             Self.Entity_Map.Insert (Name, Entity);
+            Set_Name (Entity.all, Name);
          end;
       end loop;
    end Create_Enumeration_Type;
@@ -84,6 +87,7 @@ package body Regions.Environments.Factory is
 
       Self.Entity_Map.Insert (Name, Entity);
       Self.Nested.Prepend (Name);
+      Set_Name (Entity.all, Name);
    end Create_Package;
 
    --------------------------------
@@ -110,8 +114,38 @@ package body Regions.Environments.Factory is
       begin
          Parent.Region.Insert (Symbol, Parent_Id, Type_Name);
          Self.Entity_Map.Insert (Type_Name, Entity);
+         Set_Name (Entity.all, Type_Name);
       end;
    end Create_Signed_Integer_Type;
+
+   --------------------
+   -- Create_Subtype --
+   --------------------
+
+   procedure Create_Subtype
+     (Self         : in out Environment;
+      Symbol       : Regions.Symbol;
+      Subtype_Mark : Regions.Entity_Access)
+   is
+      Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
+        Entity_Name_Lists.First_Element (Self.Nested);
+
+      Type_Name : Regions.Contexts.Selected_Entity_Name;
+   begin
+      declare
+         Entity : constant Entity_Access := new Regions.Entities.Entity'Class'
+           (Regions.Entities.Subtypes.Create
+              (Self'Unchecked_Access, Subtype_Mark.Selected_Name));
+
+         --  Insert Entity into environment can change Parent :(
+         Parent : constant Entity_Access :=
+           Get_Entity (Self'Unchecked_Access, Parent_Id);
+      begin
+         Parent.Region.Insert (Symbol, Parent_Id, Type_Name);
+         Self.Entity_Map.Insert (Type_Name, Entity);
+         Set_Name (Entity.all, Type_Name);
+      end;
+   end Create_Subtype;
 
    ----------------
    -- Initialize --

@@ -3,6 +3,8 @@
 --  SPDX-License-Identifier: Apache-2.0
 -------------------------------------------------------------
 
+with Regions.Contexts;
+
 package Regions.Entities is
    pragma Preelaborate;
 
@@ -31,13 +33,17 @@ package Regions.Entities is
      with Pre => Self.Has_Region;
 
    type Entity_Kind is
-     (An_Enumeration_Literal,
+     (A_Subtype,
+      An_Enumeration_Literal,
       An_Enumeration_Type,
       A_Signed_Integer_Type,
       A_Package);
 
    not overriding function Kind (Self : Entity) return Entity_Kind
      is abstract;
+
+   function Selected_Name (Self : Entity'Class)
+     return Regions.Contexts.Selected_Entity_Name;
 
    procedure Initialize;
 
@@ -54,6 +60,7 @@ private
    type Entity (Env : not null Environment_Access) is abstract tagged limited
    record
       Region : aliased Embedded_Region := (Entity => Entity'Unchecked_Access);
+      Name   : Regions.Contexts.Selected_Entity_Name;
    end record;
 
    not overriding procedure Insert
@@ -68,5 +75,8 @@ private
 
    function Region (Self : in out Entity'Class) return Region_Access is
       (Self.Region'Unchecked_Access);
+
+   function Selected_Name (Self : Entity'Class)
+     return Regions.Contexts.Selected_Entity_Name is (Self.Name);
 
 end Regions.Entities;

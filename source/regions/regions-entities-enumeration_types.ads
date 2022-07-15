@@ -9,7 +9,8 @@ package Regions.Entities.Enumeration_Types is
 
    type Enumeration_Type_Entity is new Entity with private;
 
-   function Create (Env : Environment_Access) return Entity'Class with Inline;
+   function Create
+     (Env : Environment_Access) return Entity'Class with Inline;
 
 private
 

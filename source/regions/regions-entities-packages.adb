@@ -17,6 +17,7 @@ package body Regions.Entities.Packages is
    begin
       return Result : Package_Entity :=
         (Env    => Self.Env,
+         Name   => Self.Name,
          Names  => Self.Names,
          Region => (Entity => null))
       do
