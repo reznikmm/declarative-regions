@@ -31,8 +31,9 @@ package Regions.Entities is
      with Pre => Self.Has_Region;
 
    type Entity_Kind is
-     (An_Enumeration_Type,
-      An_Enumeration_Literal,
+     (An_Enumeration_Literal,
+      An_Enumeration_Type,
+      A_Signed_Integer_Type,
       A_Package);
 
    not overriding function Kind (Self : Entity) return Entity_Kind

@@ -38,4 +38,9 @@ package Regions.Environments.Factory is
       Literals : Regions.Symbol_Array);
    --  Create enumeration type and corresponding literals. No new region
 
+   procedure Create_Signed_Integer_Type
+     (Self     : in out Environment;
+      Symbol   : Regions.Symbol);
+   --  Create signed integer type. No new region
+
 end Regions.Environments.Factory;

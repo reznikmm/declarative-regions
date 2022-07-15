@@ -8,6 +8,7 @@ with Regions.Entities.Enumeration_Types;
 with Regions.Entities.Enumeration_Literals;
 with Regions.Entities.Packages;
 with Regions.Entities.Roots;
+with Regions.Entities.Signed_Integer_Types;
 
 package body Regions.Environments.Factory is
 
@@ -20,7 +21,7 @@ package body Regions.Environments.Factory is
       Symbol   : Regions.Symbol;
       Literals : Regions.Symbol_Array)
    is
-      Id : constant Regions.Contexts.Selected_Entity_Name :=
+      Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
         Entity_Name_Lists.First_Element (Self.Nested);
 
       Type_Name : Regions.Contexts.Selected_Entity_Name;
@@ -31,9 +32,9 @@ package body Regions.Environments.Factory is
 
          --  Insert Entity into environment can change Parent :(
          Parent : constant Entity_Access :=
-           Get_Entity (Self'Unchecked_Access, Id);
+           Get_Entity (Self'Unchecked_Access, Parent_Id);
       begin
-         Parent.Region.Insert (Symbol, Id, Type_Name);
+         Parent.Region.Insert (Symbol, Parent_Id, Type_Name);
          Self.Entity_Map.Insert (Type_Name, Entity);
       end;
 
@@ -48,9 +49,9 @@ package body Regions.Environments.Factory is
 
             --  Insert Entity into environment can change Parent :(
             Parent : constant Entity_Access :=
-              Get_Entity (Self'Unchecked_Access, Id);
+              Get_Entity (Self'Unchecked_Access, Parent_Id);
          begin
-            Parent.Region.Insert (S, Id, Name);
+            Parent.Region.Insert (S, Parent_Id, Name);
             Self.Entity_Map.Insert (Name, Entity);
          end;
       end loop;
@@ -64,6 +65,9 @@ package body Regions.Environments.Factory is
      (Self   : in out Environment;
       Symbol : Regions.Symbol)
    is
+      Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
+        Entity_Name_Lists.First_Element (Self.Nested);
+
       Entity : constant Entity_Access :=
         new Regions.Entities.Entity'Class'
           (Regions.Entities.Packages.Create (Self'Unchecked_Access));
@@ -71,19 +75,43 @@ package body Regions.Environments.Factory is
       Name : Regions.Contexts.Selected_Entity_Name;
    begin
       declare
-         Id : constant Regions.Contexts.Selected_Entity_Name :=
-           Entity_Name_Lists.First_Element (Self.Nested);
-
          --  Insert Entity into environment can change Parent :(
          Parent : constant Entity_Access :=
-           Get_Entity (Self'Unchecked_Access, Id);
+           Get_Entity (Self'Unchecked_Access, Parent_Id);
       begin
-         Parent.Region.Insert (Symbol, Id, Name);
+         Parent.Region.Insert (Symbol, Parent_Id, Name);
       end;
 
       Self.Entity_Map.Insert (Name, Entity);
       Self.Nested.Prepend (Name);
    end Create_Package;
+
+   --------------------------------
+   -- Create_Signed_Integer_Type --
+   --------------------------------
+
+   procedure Create_Signed_Integer_Type
+     (Self     : in out Environment;
+      Symbol   : Regions.Symbol)
+   is
+      Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
+        Entity_Name_Lists.First_Element (Self.Nested);
+
+      Type_Name : Regions.Contexts.Selected_Entity_Name;
+   begin
+      declare
+         Entity : constant Entity_Access := new Regions.Entities.Entity'Class'
+           (Regions.Entities.Signed_Integer_Types.Create
+              (Self'Unchecked_Access));
+
+         --  Insert Entity into environment can change Parent :(
+         Parent : constant Entity_Access :=
+           Get_Entity (Self'Unchecked_Access, Parent_Id);
+      begin
+         Parent.Region.Insert (Symbol, Parent_Id, Type_Name);
+         Self.Entity_Map.Insert (Type_Name, Entity);
+      end;
+   end Create_Signed_Integer_Type;
 
    ----------------
    -- Initialize --
