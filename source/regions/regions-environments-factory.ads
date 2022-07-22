@@ -43,6 +43,27 @@ package Regions.Environments.Factory is
       Symbol   : Regions.Symbol);
    --  Create signed integer type. No new region
 
+   procedure Create_Floating_Point_Type
+     (Self   : in out Environment;
+      Symbol : Regions.Symbol);
+   --  Create floating point type. No new region
+
+   procedure Create_Fixed_Point_Type
+     (Self   : in out Environment;
+      Symbol : Regions.Symbol);
+   --  Create fixed point type. No new region
+
+   procedure Create_Array_Type
+     (Self    : in out Environment;
+      Symbol  : Regions.Symbol;
+      Indexes : Regions.Entity_Access_Array);
+   --  Create subtype with given subtype mark. Create region
+
+   procedure Set_Component_Type
+     (Self    : in out Environment;
+      Element : Regions.Entity_Access);
+   --  Assign an array component type
+
    procedure Create_Subtype
      (Self         : in out Environment;
       Symbol       : Regions.Symbol;

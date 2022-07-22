@@ -73,6 +73,11 @@ private
      (Env  : Environment_Access;
       Name : Regions.Contexts.Selected_Entity_Name) return Entity_Access;
 
+   function Get_Entities
+     (Env   : Environment_Access;
+      Names : Regions.Contexts.Selected_Entity_Name_Array)
+      return Entity_Access_Array;
+
    Clone : access function (Self : Regions.Entities.Entity'Class)
      return Entity_Access;
 

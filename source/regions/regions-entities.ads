@@ -37,6 +37,9 @@ package Regions.Entities is
       An_Enumeration_Literal,
       An_Enumeration_Type,
       A_Signed_Integer_Type,
+      A_Floating_Point_Type,
+      A_Fixed_Point_Type,
+      An_Array_Type,
       A_Package);
 
    not overriding function Kind (Self : Entity) return Entity_Kind

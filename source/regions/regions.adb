@@ -30,6 +30,26 @@ package body Regions is
       Name : Regions.Contexts.Selected_Entity_Name) return Entity_Access is
         (Regions.Environments.Internal.Get_Entity (Env.all, Name));
 
+   ------------------
+   -- Get_Entities --
+   ------------------
+
+   function Get_Entities
+     (Env   : Environment_Access;
+      Names : Regions.Contexts.Selected_Entity_Name_Array)
+      return Entity_Access_Array is
+   begin
+      return Result : Entity_Access_Array (Names'Range) do
+         for J in Result'Range loop
+            Result (J) := Get_Entity (Env, Names (J));
+         end loop;
+      end return;
+   end Get_Entities;
+
+   --------------------
+   -- Get_For_Update --
+   --------------------
+
    function Get_For_Update
      (Env  : Environment_Access;
       Name : Regions.Contexts.Selected_Entity_Name) return Entity_Access is

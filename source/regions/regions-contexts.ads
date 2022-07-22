@@ -12,6 +12,9 @@ package Regions.Contexts is
    type Entity_Name is private;
    type Selected_Entity_Name is private;
 
+   type Selected_Entity_Name_Array is
+     array (Positive range <>) of Selected_Entity_Name;
+
    No_Profile : constant Profile_Id;
    --  To create an non-overloadable entity (without any profile)
 

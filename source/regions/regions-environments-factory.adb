@@ -4,14 +4,51 @@
 -------------------------------------------------------------
 
 with Regions.Contexts;
-with Regions.Entities.Enumeration_Types;
+with Regions.Entities.Array_Types;
 with Regions.Entities.Enumeration_Literals;
+with Regions.Entities.Enumeration_Types;
+with Regions.Entities.Fixed_Point_Types;
+with Regions.Entities.Floating_Point_Types;
 with Regions.Entities.Packages;
 with Regions.Entities.Roots;
 with Regions.Entities.Signed_Integer_Types;
 with Regions.Entities.Subtypes;
 
 package body Regions.Environments.Factory is
+
+   -----------------------
+   -- Create_Array_Type --
+   -----------------------
+
+   procedure Create_Array_Type
+     (Self    : in out Environment;
+      Symbol  : Regions.Symbol;
+      Indexes : Regions.Entity_Access_Array)
+   is
+      Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
+        Entity_Name_Lists.First_Element (Self.Nested);
+
+      Index_Names : Contexts.Selected_Entity_Name_Array (Indexes'Range);
+      Type_Name   : Regions.Contexts.Selected_Entity_Name;
+   begin
+      for J in Indexes'Range loop
+         Index_Names (J) := Indexes (J).Selected_Name;
+      end loop;
+
+      declare
+         Entity : constant Entity_Access := new Regions.Entities.Entity'Class'
+           (Regions.Entities.Array_Types.Create
+              (Self'Unchecked_Access, Index_Names));
+
+         --  Insert Entity into environment can change Parent :(
+         Parent : constant Entity_Access :=
+           Get_Entity (Self'Unchecked_Access, Parent_Id);
+      begin
+         Parent.Region.Insert (Symbol, Parent_Id, Type_Name);
+         Self.Entity_Map.Insert (Type_Name, Entity);
+         Set_Name (Entity.all, Type_Name);
+      end;
+   end Create_Array_Type;
 
    -----------------------------
    -- Create_Enumeration_Type --
@@ -59,6 +96,62 @@ package body Regions.Environments.Factory is
          end;
       end loop;
    end Create_Enumeration_Type;
+
+   -----------------------------
+   -- Create_Fixed_Point_Type --
+   -----------------------------
+
+   procedure Create_Fixed_Point_Type
+     (Self   : in out Environment;
+      Symbol : Regions.Symbol)
+   is
+      Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
+        Entity_Name_Lists.First_Element (Self.Nested);
+
+      Type_Name : Regions.Contexts.Selected_Entity_Name;
+   begin
+      declare
+         Entity : constant Entity_Access := new Regions.Entities.Entity'Class'
+           (Regions.Entities.Fixed_Point_Types.Create
+              (Self'Unchecked_Access));
+
+         --  Insert Entity into environment can change Parent :(
+         Parent : constant Entity_Access :=
+           Get_Entity (Self'Unchecked_Access, Parent_Id);
+      begin
+         Parent.Region.Insert (Symbol, Parent_Id, Type_Name);
+         Self.Entity_Map.Insert (Type_Name, Entity);
+         Set_Name (Entity.all, Type_Name);
+      end;
+   end Create_Fixed_Point_Type;
+
+   --------------------------------
+   -- Create_Floating_Point_Type --
+   --------------------------------
+
+   procedure Create_Floating_Point_Type
+     (Self     : in out Environment;
+      Symbol   : Regions.Symbol)
+   is
+      Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
+        Entity_Name_Lists.First_Element (Self.Nested);
+
+      Type_Name : Regions.Contexts.Selected_Entity_Name;
+   begin
+      declare
+         Entity : constant Entity_Access := new Regions.Entities.Entity'Class'
+           (Regions.Entities.Floating_Point_Types.Create
+              (Self'Unchecked_Access));
+
+         --  Insert Entity into environment can change Parent :(
+         Parent : constant Entity_Access :=
+           Get_Entity (Self'Unchecked_Access, Parent_Id);
+      begin
+         Parent.Region.Insert (Symbol, Parent_Id, Type_Name);
+         Self.Entity_Map.Insert (Type_Name, Entity);
+         Set_Name (Entity.all, Type_Name);
+      end;
+   end Create_Floating_Point_Type;
 
    --------------------
    -- Create_Package --
@@ -201,6 +294,25 @@ package body Regions.Environments.Factory is
          Result.Nested := Self.Nested;
       end return;
    end Make_Snapshot;
+
+   ------------------------
+   -- Set_Component_Type --
+   ------------------------
+
+   procedure Set_Component_Type
+     (Self    : in out Environment;
+      Element : Regions.Entity_Access)
+   is
+      Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
+        Entity_Name_Lists.First_Element (Self.Nested);
+
+      Parent : constant Entity_Access :=
+        Get_Entity (Self'Unchecked_Access, Parent_Id);
+
+   begin
+      Regions.Entities.Array_Types.Array_Type_Entity (Parent.all)
+        .Set_Element (Element.Selected_Name);
+   end Set_Component_Type;
 
    -------------------
    -- With_Snapshot --
