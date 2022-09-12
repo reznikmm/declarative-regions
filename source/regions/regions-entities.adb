@@ -1,6 +1,6 @@
 --  SPDX-FileCopyrightText: 2022 Max Reznik <reznikmm@gmail.com>
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
 package body Regions.Entities is
@@ -8,9 +8,31 @@ package body Regions.Entities is
    function Clone (Self : Entity'Class) return Entity_Access is
       (new Entity'Class'(Self.Clone));
 
-   procedure Set_Name
-     (Self : in out Regions.Entities.Entity'Class;
-      Name : Regions.Contexts.Selected_Entity_Name);
+   -----------------------
+   -- Immediate_Visible --
+   -----------------------
+
+   overriding function Immediate_Visible
+     (Self   : Entity_With_Region;
+      Symbol : Regions.Symbol) return Entity_Access_Array is
+   begin
+      if Self.Names.Contains (Symbol) then
+         declare
+            List  : constant Entity_Name_Lists.List :=
+              Self.Names.Element (Symbol);
+            Index : Natural := List.Length;
+         begin
+            return Result : Entity_Access_Array (1 .. List.Length) do
+               for Item of List loop
+                  Result (Index) := Get_Entity (Self.Env, Item);
+                  Index := Index - 1;
+               end loop;
+            end return;
+         end;
+      else
+         return (1 .. 0 => null);
+      end if;
+   end Immediate_Visible;
 
    ----------------
    -- Initialize --
@@ -19,7 +41,6 @@ package body Regions.Entities is
    procedure Initialize is
    begin
       Regions.Clone := Clone'Access;
-      Regions.Set_Name := Set_Name'Access;
    end Initialize;
 
    ------------
@@ -29,8 +50,7 @@ package body Regions.Entities is
    not overriding procedure Insert
      (Self   : in out Entity;
       Symbol : Regions.Symbol;
-      Parent : Regions.Contexts.Selected_Entity_Name;
-      Name   : out Regions.Contexts.Selected_Entity_Name) is
+      Name   : Regions.Contexts.Selected_Entity_Name) is
    begin
       raise Program_Error;  --  Should be overrided
    end Insert;
@@ -42,21 +62,28 @@ package body Regions.Entities is
    overriding procedure Insert
      (Self   : in out Embedded_Region;
       Symbol : Regions.Symbol;
-      Parent : Regions.Contexts.Selected_Entity_Name;
-      Name   : out Regions.Contexts.Selected_Entity_Name)
-   is
+      Name   : Regions.Contexts.Selected_Entity_Name) is
    begin
-      Self.Entity.Insert (Symbol, Parent, Name);
+      Self.Entity.Insert (Symbol, Name);
    end Insert;
 
-   --------------
-   -- Set_Name --
-   --------------
+   ------------
+   -- Insert --
+   ------------
 
-   procedure Set_Name
-     (Self : in out Regions.Entities.Entity'Class;
-      Name : Regions.Contexts.Selected_Entity_Name) is
+   overriding procedure Insert
+     (Self   : in out Entity_With_Region;
+      Symbol : Regions.Symbol;
+      Name   : Regions.Contexts.Selected_Entity_Name)
+   is
+      List : Entity_Name_Lists.List;
    begin
-      Self.Name := Name;
-   end Set_Name;
+      if Self.Names.Contains (Symbol) then
+         List := Self.Names.Element (Symbol);
+      end if;
+
+      List.Prepend (Name);
+      Self.Names.Insert (Symbol, List);
+   end Insert;
+
 end Regions.Entities;

@@ -3,38 +3,38 @@
 --  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
-package Regions.Entities.Signed_Integer_Types is
+package Regions.Entities.Exceptions is
 
    pragma Preelaborate;
 
-   type Signed_Integer_Type_Entity is new Entity with private;
+   type Exception_Entity is new Entity with private;
 
    function Create
      (Env  : Environment_Access;
       Name : Regions.Contexts.Selected_Entity_Name) return Entity'Class
-        with Inline;
+     with Inline;
 
 private
 
-   type Signed_Integer_Type_Entity is new Entity with null record;
+   type Exception_Entity is new Entity with null record;
 
    overriding function Kind
-     (Self : Signed_Integer_Type_Entity) return Entity_Kind
-       is (A_Signed_Integer_Type);
+     (Self : Exception_Entity) return Entity_Kind
+       is (An_Exception);
 
    overriding function Has_Region
-     (Self : Signed_Integer_Type_Entity) return Boolean is (False);
+     (Self : Exception_Entity) return Boolean is (False);
 
    overriding function Is_Overloadable
-     (Self : Signed_Integer_Type_Entity) return Boolean is (False);
+     (Self : Exception_Entity) return Boolean is (False);
 
    overriding function Immediate_Visible
-     (Self   : Signed_Integer_Type_Entity;
+     (Self   : Exception_Entity;
       Symbol : Regions.Symbol) return Entity_Access_Array is (1 .. 0 => <>);
 
    function Create
      (Env  : Environment_Access;
       Name : Regions.Contexts.Selected_Entity_Name) return Entity'Class is
-        (Signed_Integer_Type_Entity'(Env, Name));
+        (Exception_Entity'(Env, Name));
 
-end Regions.Entities.Signed_Integer_Types;
+end Regions.Entities.Exceptions;

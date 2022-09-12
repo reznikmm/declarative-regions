@@ -1,6 +1,6 @@
 --  SPDX-FileCopyrightText: 2022 Max Reznik <reznikmm@gmail.com>
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
 package Regions.Environments.Factory is
@@ -69,5 +69,10 @@ package Regions.Environments.Factory is
       Symbol       : Regions.Symbol;
       Subtype_Mark : Regions.Entity_Access);
    --  Create subtype with given subtype mark. No new region
+
+   procedure Create_Exception
+     (Self   : in out Environment;
+      Symbol : Regions.Symbol);
+   --  Create an exception. No new region
 
 end Regions.Environments.Factory;

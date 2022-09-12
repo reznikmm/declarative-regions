@@ -1,12 +1,13 @@
 --  SPDX-FileCopyrightText: 2022 Max Reznik <reznikmm@gmail.com>
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
 with Regions.Contexts;
 with Regions.Entities.Array_Types;
 with Regions.Entities.Enumeration_Literals;
 with Regions.Entities.Enumeration_Types;
+with Regions.Entities.Exceptions;
 with Regions.Entities.Fixed_Point_Types;
 with Regions.Entities.Floating_Point_Types;
 with Regions.Entities.Packages;
@@ -28,8 +29,11 @@ package body Regions.Environments.Factory is
       Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
         Entity_Name_Lists.First_Element (Self.Nested);
 
+      Type_Name : constant Regions.Contexts.Selected_Entity_Name :=
+        Self.Context.New_Selected_Name
+          (Parent_Id, Self.Context.New_Entity_Name (Symbol));
+
       Index_Names : Contexts.Selected_Entity_Name_Array (Indexes'Range);
-      Type_Name   : Regions.Contexts.Selected_Entity_Name;
    begin
       for J in Indexes'Range loop
          Index_Names (J) := Indexes (J).Selected_Name;
@@ -38,15 +42,14 @@ package body Regions.Environments.Factory is
       declare
          Entity : constant Entity_Access := new Regions.Entities.Entity'Class'
            (Regions.Entities.Array_Types.Create
-              (Self'Unchecked_Access, Index_Names));
+              (Self'Unchecked_Access, Type_Name, Index_Names));
 
          --  Insert Entity into environment can change Parent :(
          Parent : constant Entity_Access :=
            Get_Entity (Self'Unchecked_Access, Parent_Id);
       begin
-         Parent.Region.Insert (Symbol, Parent_Id, Type_Name);
+         Parent.Region.Insert (Symbol, Type_Name);
          Self.Entity_Map.Insert (Type_Name, Entity);
-         Set_Name (Entity.all, Type_Name);
       end;
    end Create_Array_Type;
 
@@ -62,40 +65,77 @@ package body Regions.Environments.Factory is
       Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
         Entity_Name_Lists.First_Element (Self.Nested);
 
-      Type_Name : Regions.Contexts.Selected_Entity_Name;
+      Type_Name : constant Regions.Contexts.Selected_Entity_Name :=
+        Self.Context.New_Selected_Name
+          (Parent_Id, Self.Context.New_Entity_Name (Symbol));
+
+      Profile : constant Regions.Contexts.Profile_Id :=
+        Self.Context.Empty_Function_Profile (Type_Name);
+
    begin
       declare
          Entity : constant Entity_Access := new Regions.Entities.Entity'Class'
-           (Regions.Entities.Enumeration_Types.Create (Self'Unchecked_Access));
+           (Regions.Entities.Enumeration_Types.Create
+              (Self'Unchecked_Access, Type_Name));
 
          --  Insert Entity into environment can change Parent :(
          Parent : constant Entity_Access :=
            Get_Entity (Self'Unchecked_Access, Parent_Id);
       begin
-         Parent.Region.Insert (Symbol, Parent_Id, Type_Name);
+         Parent.Region.Insert (Symbol, Type_Name);
          Self.Entity_Map.Insert (Type_Name, Entity);
-         Set_Name (Entity.all, Type_Name);
       end;
 
       for S of Literals loop
          declare
+            Name : constant Regions.Contexts.Selected_Entity_Name :=
+              Self.Context.New_Selected_Name
+                (Parent_Id, Self.Context.New_Entity_Name (S, Profile));
+
             Entity : constant Entity_Access :=
               new Regions.Entities.Entity'Class'
                 (Regions.Entities.Enumeration_Literals.Create
-                   (Self'Unchecked_Access, Type_Name));
-
-            Name : Regions.Contexts.Selected_Entity_Name;
+                   (Self'Unchecked_Access, Name, Type_Name));
 
             --  Insert Entity into environment can change Parent :(
             Parent : constant Entity_Access :=
               Get_Entity (Self'Unchecked_Access, Parent_Id);
          begin
-            Parent.Region.Insert (S, Parent_Id, Name);
+            Parent.Region.Insert (S, Name);
             Self.Entity_Map.Insert (Name, Entity);
-            Set_Name (Entity.all, Name);
          end;
       end loop;
    end Create_Enumeration_Type;
+
+   ----------------------
+   -- Create_Exception --
+   ----------------------
+
+   procedure Create_Exception
+     (Self   : in out Environment;
+      Symbol : Regions.Symbol)
+   is
+      Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
+        Entity_Name_Lists.First_Element (Self.Nested);
+
+      Type_Name : constant Regions.Contexts.Selected_Entity_Name :=
+        Self.Context.New_Selected_Name
+          (Parent_Id, Self.Context.New_Entity_Name (Symbol));
+
+   begin
+      declare
+         Entity : constant Entity_Access := new Regions.Entities.Entity'Class'
+           (Regions.Entities.Exceptions.Create
+              (Self'Unchecked_Access, Type_Name));
+
+         --  Insert Entity into environment can change Parent :(
+         Parent : constant Entity_Access :=
+           Get_Entity (Self'Unchecked_Access, Parent_Id);
+      begin
+         Parent.Region.Insert (Symbol, Type_Name);
+         Self.Entity_Map.Insert (Type_Name, Entity);
+      end;
+   end Create_Exception;
 
    -----------------------------
    -- Create_Fixed_Point_Type --
@@ -108,20 +148,22 @@ package body Regions.Environments.Factory is
       Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
         Entity_Name_Lists.First_Element (Self.Nested);
 
-      Type_Name : Regions.Contexts.Selected_Entity_Name;
+      Type_Name : constant Regions.Contexts.Selected_Entity_Name :=
+        Self.Context.New_Selected_Name
+          (Parent_Id, Self.Context.New_Entity_Name (Symbol));
+
    begin
       declare
          Entity : constant Entity_Access := new Regions.Entities.Entity'Class'
            (Regions.Entities.Fixed_Point_Types.Create
-              (Self'Unchecked_Access));
+              (Self'Unchecked_Access, Type_Name));
 
          --  Insert Entity into environment can change Parent :(
          Parent : constant Entity_Access :=
            Get_Entity (Self'Unchecked_Access, Parent_Id);
       begin
-         Parent.Region.Insert (Symbol, Parent_Id, Type_Name);
+         Parent.Region.Insert (Symbol, Type_Name);
          Self.Entity_Map.Insert (Type_Name, Entity);
-         Set_Name (Entity.all, Type_Name);
       end;
    end Create_Fixed_Point_Type;
 
@@ -136,20 +178,22 @@ package body Regions.Environments.Factory is
       Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
         Entity_Name_Lists.First_Element (Self.Nested);
 
-      Type_Name : Regions.Contexts.Selected_Entity_Name;
+      Type_Name : constant Regions.Contexts.Selected_Entity_Name :=
+        Self.Context.New_Selected_Name
+          (Parent_Id, Self.Context.New_Entity_Name (Symbol));
+
    begin
       declare
          Entity : constant Entity_Access := new Regions.Entities.Entity'Class'
            (Regions.Entities.Floating_Point_Types.Create
-              (Self'Unchecked_Access));
+              (Self'Unchecked_Access, Type_Name));
 
          --  Insert Entity into environment can change Parent :(
          Parent : constant Entity_Access :=
            Get_Entity (Self'Unchecked_Access, Parent_Id);
       begin
-         Parent.Region.Insert (Symbol, Parent_Id, Type_Name);
+         Parent.Region.Insert (Symbol, Type_Name);
          Self.Entity_Map.Insert (Type_Name, Entity);
-         Set_Name (Entity.all, Type_Name);
       end;
    end Create_Floating_Point_Type;
 
@@ -164,23 +208,25 @@ package body Regions.Environments.Factory is
       Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
         Entity_Name_Lists.First_Element (Self.Nested);
 
+      Name : constant Regions.Contexts.Selected_Entity_Name :=
+        Self.Context.New_Selected_Name
+          (Parent_Id, Self.Context.New_Entity_Name (Symbol));
+
       Entity : constant Entity_Access :=
         new Regions.Entities.Entity'Class'
-          (Regions.Entities.Packages.Create (Self'Unchecked_Access));
+          (Regions.Entities.Packages.Create (Self'Unchecked_Access, Name));
 
-      Name : Regions.Contexts.Selected_Entity_Name;
    begin
       declare
          --  Insert Entity into environment can change Parent :(
          Parent : constant Entity_Access :=
            Get_Entity (Self'Unchecked_Access, Parent_Id);
       begin
-         Parent.Region.Insert (Symbol, Parent_Id, Name);
+         Parent.Region.Insert (Symbol, Name);
       end;
 
       Self.Entity_Map.Insert (Name, Entity);
       Self.Nested.Prepend (Name);
-      Set_Name (Entity.all, Name);
    end Create_Package;
 
    --------------------------------
@@ -194,20 +240,22 @@ package body Regions.Environments.Factory is
       Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
         Entity_Name_Lists.First_Element (Self.Nested);
 
-      Type_Name : Regions.Contexts.Selected_Entity_Name;
+      Type_Name : constant Regions.Contexts.Selected_Entity_Name :=
+        Self.Context.New_Selected_Name
+          (Parent_Id, Self.Context.New_Entity_Name (Symbol));
+
    begin
       declare
          Entity : constant Entity_Access := new Regions.Entities.Entity'Class'
            (Regions.Entities.Signed_Integer_Types.Create
-              (Self'Unchecked_Access));
+              (Self'Unchecked_Access, Type_Name));
 
          --  Insert Entity into environment can change Parent :(
          Parent : constant Entity_Access :=
            Get_Entity (Self'Unchecked_Access, Parent_Id);
       begin
-         Parent.Region.Insert (Symbol, Parent_Id, Type_Name);
+         Parent.Region.Insert (Symbol, Type_Name);
          Self.Entity_Map.Insert (Type_Name, Entity);
-         Set_Name (Entity.all, Type_Name);
       end;
    end Create_Signed_Integer_Type;
 
@@ -223,20 +271,22 @@ package body Regions.Environments.Factory is
       Parent_Id : constant Regions.Contexts.Selected_Entity_Name :=
         Entity_Name_Lists.First_Element (Self.Nested);
 
-      Type_Name : Regions.Contexts.Selected_Entity_Name;
+      Type_Name : constant Regions.Contexts.Selected_Entity_Name :=
+        Self.Context.New_Selected_Name
+          (Parent_Id, Self.Context.New_Entity_Name (Symbol));
+
    begin
       declare
          Entity : constant Entity_Access := new Regions.Entities.Entity'Class'
            (Regions.Entities.Subtypes.Create
-              (Self'Unchecked_Access, Subtype_Mark.Selected_Name));
+              (Self'Unchecked_Access, Type_Name, Subtype_Mark.Selected_Name));
 
          --  Insert Entity into environment can change Parent :(
          Parent : constant Entity_Access :=
            Get_Entity (Self'Unchecked_Access, Parent_Id);
       begin
-         Parent.Region.Insert (Symbol, Parent_Id, Type_Name);
+         Parent.Region.Insert (Symbol, Type_Name);
          Self.Entity_Map.Insert (Type_Name, Entity);
-         Set_Name (Entity.all, Type_Name);
       end;
    end Create_Subtype;
 

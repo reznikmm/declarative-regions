@@ -1,6 +1,6 @@
 --  SPDX-FileCopyrightText: 2022 Max Reznik <reznikmm@gmail.com>
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
 package body Regions.Environments.Internal is

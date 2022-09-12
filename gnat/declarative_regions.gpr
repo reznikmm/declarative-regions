@@ -7,7 +7,7 @@ project Declarative_Regions is
 
    type Library_Kind is ("static", "relocatable");
    Library_Type : Library_Kind := external ("LIBRARY_TYPE", "relocatable");
- 
+
    type Project_Build_Kind is ("dev", "prod", "coverage");
    Build_Mode : Project_Build_Kind :=
      external ("DECLARATIVE_REGIONS_BUILD_MODE", external ("BUILD_MODE", "prod"));
@@ -29,7 +29,7 @@ project Declarative_Regions is
      ("-gnat12", "-gnatW8", "-g");
 
    Check_Ada_Switches :=
-     ("-gnatVa", "-gnatwea", "-gnaty", "-gnata");
+     ("-gnatVa", "-gnatwa", "-gnaty", "-gnata");
 
    Linker_Options := ();
 

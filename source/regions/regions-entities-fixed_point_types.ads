@@ -3,11 +3,11 @@
 --  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
-package Regions.Entities.Signed_Integer_Types is
+package Regions.Entities.Fixed_Point_Types is
 
    pragma Preelaborate;
 
-   type Signed_Integer_Type_Entity is new Entity with private;
+   type Fixed_Point_Type_Entity is new Entity with private;
 
    function Create
      (Env  : Environment_Access;
@@ -16,25 +16,25 @@ package Regions.Entities.Signed_Integer_Types is
 
 private
 
-   type Signed_Integer_Type_Entity is new Entity with null record;
+   type Fixed_Point_Type_Entity is new Entity with null record;
 
    overriding function Kind
-     (Self : Signed_Integer_Type_Entity) return Entity_Kind
-       is (A_Signed_Integer_Type);
+     (Self : Fixed_Point_Type_Entity) return Entity_Kind
+       is (A_Fixed_Point_Type);
 
    overriding function Has_Region
-     (Self : Signed_Integer_Type_Entity) return Boolean is (False);
+     (Self : Fixed_Point_Type_Entity) return Boolean is (False);
 
    overriding function Is_Overloadable
-     (Self : Signed_Integer_Type_Entity) return Boolean is (False);
+     (Self : Fixed_Point_Type_Entity) return Boolean is (False);
 
    overriding function Immediate_Visible
-     (Self   : Signed_Integer_Type_Entity;
+     (Self   : Fixed_Point_Type_Entity;
       Symbol : Regions.Symbol) return Entity_Access_Array is (1 .. 0 => <>);
 
    function Create
      (Env  : Environment_Access;
       Name : Regions.Contexts.Selected_Entity_Name) return Entity'Class is
-        (Signed_Integer_Type_Entity'(Env, Name));
+      (Fixed_Point_Type_Entity'(Env, Name));
 
-end Regions.Entities.Signed_Integer_Types;
+end Regions.Entities.Fixed_Point_Types;

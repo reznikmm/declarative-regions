@@ -1,6 +1,6 @@
 --  SPDX-FileCopyrightText: 2022 Max Reznik <reznikmm@gmail.com>
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
 limited with Regions.Entities;
@@ -60,9 +60,8 @@ private
    not overriding procedure Insert
      (Self   : in out Region;
       Symbol : Regions.Symbol;
-      Parent : Regions.Contexts.Selected_Entity_Name;
-      Name   : out Regions.Contexts.Selected_Entity_Name);
-   --  Create Name from Parent name and symbol and insert it into the Region.
+      Name   : Regions.Contexts.Selected_Entity_Name);
+   --  Insert Name with given Symbol into the Region.
    --  I want it to be abstract :(
 
    function Get_Entity
@@ -80,9 +79,5 @@ private
 
    Clone : access function (Self : Regions.Entities.Entity'Class)
      return Entity_Access;
-
-   Set_Name : access procedure
-     (Self : in out Regions.Entities.Entity'Class;
-      Name : Regions.Contexts.Selected_Entity_Name);
 
 end Regions;

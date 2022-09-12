@@ -1,6 +1,6 @@
 --  SPDX-FileCopyrightText: 2022 Max Reznik <reznikmm@gmail.com>
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
 private with Regions.Contexts;
@@ -13,6 +13,7 @@ package Regions.Entities.Enumeration_Literals is
 
    function Create
      (Env  : Environment_Access;
+      Name : Regions.Contexts.Selected_Entity_Name;
       Tipe : Regions.Contexts.Selected_Entity_Name)
         return Entity'Class with Inline;
 
@@ -41,11 +42,12 @@ private
 
    function Create
      (Env  : Environment_Access;
+      Name : Regions.Contexts.Selected_Entity_Name;
       Tipe : Regions.Contexts.Selected_Entity_Name)
         return Entity'Class is
-          (Enumeration_Literal_Entity'(Env => Env,
-                                       Tipe   => Tipe,
-                                       others => <>));
+          (Enumeration_Literal_Entity'(Env  => Env,
+                                       Tipe => Tipe,
+                                       Name => Name));
 
    function Enumeration_Type (Self : Enumeration_Literal_Entity)
      return Entity_Access is (Get_Entity (Self.Env, Self.Tipe));

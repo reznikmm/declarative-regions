@@ -1,6 +1,6 @@
 --  SPDX-FileCopyrightText: 2022 Max Reznik <reznikmm@gmail.com>
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
 with Regions.Contexts;
@@ -87,8 +87,7 @@ package body Regions is
    not overriding procedure Insert
      (Self   : in out Region;
       Symbol : Regions.Symbol;
-      Parent : Regions.Contexts.Selected_Entity_Name;
-      Name   : out Regions.Contexts.Selected_Entity_Name) is
+      Name   : Regions.Contexts.Selected_Entity_Name) is
    begin
       raise Program_Error;  --  Should be overrided
    end Insert;

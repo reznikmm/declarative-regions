@@ -1,6 +1,6 @@
 --  SPDX-FileCopyrightText: 2022 Max Reznik <reznikmm@gmail.com>
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
 with Regions.Contexts;
@@ -20,6 +20,9 @@ package Regions.Entities.Roots is
 private
 
    type Root_Entity is new Entity with record
+      Region : aliased Embedded_Region :=
+        (Entity => Root_Entity'Unchecked_Access);
+
       Standard : Symbol;
    end record;
 
@@ -30,14 +33,16 @@ private
      is (True);
    --  ??? root region doesn't have a corresponding entity
 
+   overriding function Region (Self : in out Root_Entity) return Region_Access
+     is (Self.Region'Unchecked_Access);
+
    overriding function Is_Overloadable (Self : Root_Entity) return Boolean
      is (False);
 
    overriding procedure Insert
      (Self   : in out Root_Entity;
       Symbol : Regions.Symbol;
-      Parent : Regions.Contexts.Selected_Entity_Name;
-      Name   : out Regions.Contexts.Selected_Entity_Name);
+      Name   : Regions.Contexts.Selected_Entity_Name);
 
    overriding function Immediate_Visible
      (Self   : Root_Entity;

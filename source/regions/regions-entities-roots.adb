@@ -3,10 +3,6 @@
 --  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
-pragma Warnings (Off);
-with Regions.Environments;
-pragma Warnings (On);
-
 package body Regions.Entities.Roots is
 
    ------------
@@ -29,18 +25,9 @@ package body Regions.Entities.Roots is
    overriding procedure Insert
      (Self   : in out Root_Entity;
       Symbol : Regions.Symbol;
-      Parent : Regions.Contexts.Selected_Entity_Name;
-      Name   : out Regions.Contexts.Selected_Entity_Name)
-   is
-      use type Regions.Contexts.Selected_Entity_Name;
+      Name   : Regions.Contexts.Selected_Entity_Name) is
    begin
-      if Symbol = Self.Standard then
-         pragma Assert (Parent = Self.Env.Context.Root_Name);
-
-         Name := Self.Env.Context.New_Selected_Name
-           (Parent,
-            Self.Env.Context.New_Entity_Name (Symbol));
-      else
+      if Symbol /= Self.Standard then
          raise Program_Error;
       end if;
    end Insert;

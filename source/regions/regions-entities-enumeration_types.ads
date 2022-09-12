@@ -1,6 +1,6 @@
 --  SPDX-FileCopyrightText: 2022 Max Reznik <reznikmm@gmail.com>
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
 package Regions.Entities.Enumeration_Types is
@@ -10,7 +10,9 @@ package Regions.Entities.Enumeration_Types is
    type Enumeration_Type_Entity is new Entity with private;
 
    function Create
-     (Env : Environment_Access) return Entity'Class with Inline;
+     (Env  : Environment_Access;
+      Name : Regions.Contexts.Selected_Entity_Name) return Entity'Class
+        with Inline;
 
 private
 
@@ -30,7 +32,9 @@ private
      (Self   : Enumeration_Type_Entity;
       Symbol : Regions.Symbol) return Entity_Access_Array is (1 .. 0 => <>);
 
-   function Create (Env : Environment_Access) return Entity'Class is
-      (Enumeration_Type_Entity'(Env => Env, others => <>));
+   function Create
+     (Env  : Environment_Access;
+      Name : Regions.Contexts.Selected_Entity_Name) return Entity'Class is
+        (Enumeration_Type_Entity'(Env, Name));
 
 end Regions.Entities.Enumeration_Types;

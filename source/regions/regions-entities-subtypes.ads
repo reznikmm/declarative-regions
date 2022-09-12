@@ -1,6 +1,6 @@
 --  SPDX-FileCopyrightText: 2022 Max Reznik <reznikmm@gmail.com>
 --
---  SPDX-License-Identifier: Apache-2.0
+--  SPDX-License-Identifier: MIT
 -------------------------------------------------------------
 
 private with Regions.Contexts;
@@ -13,6 +13,7 @@ package Regions.Entities.Subtypes is
 
    function Create
      (Env          : Environment_Access;
+      Name         : Regions.Contexts.Selected_Entity_Name;
       Subtype_Mark : Regions.Contexts.Selected_Entity_Name)
       return Entity'Class with Inline;
 
@@ -39,11 +40,12 @@ private
 
    function Create
      (Env          : Environment_Access;
+      Name         : Regions.Contexts.Selected_Entity_Name;
       Subtype_Mark : Regions.Contexts.Selected_Entity_Name)
       return Entity'Class is
         (Subtype_Entity'(Env          => Env,
-                         Subtype_Mark => Subtype_Mark,
-                         others       => <>));
+                         Name         => Name,
+                         Subtype_Mark => Subtype_Mark));
 
    function Subtype_Mark (Self : Subtype_Entity)
      return Entity_Access is (Get_Entity (Self.Env, Self.Subtype_Mark));

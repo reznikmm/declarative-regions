@@ -18,9 +18,6 @@ package Regions.Contexts is
    No_Profile : constant Profile_Id;
    --  To create an non-overloadable entity (without any profile)
 
-   Root_Entity : constant Selected_Entity_Name;
-   --  An artifical entity containing standard package
-
    function Hash (List : Selected_Entity_Name) return Ada.Containers.Hash_Type;
 
    type Context is tagged limited private;
@@ -72,7 +69,7 @@ package Regions.Contexts is
    ------------------------------------
 
    function Root_Name (Self : Context) return Selected_Entity_Name;
-   --  Return Name of Standard's parent region
+   --  Return Name of an artifical entity containing Standard package
 
    function New_Selected_Name
      (Self     : in out Context;
@@ -87,9 +84,6 @@ private
 
    No_Profile : constant Profile_Id := 0;
    --  To create an non-overloadable entity (without any profile)
-   Root_Entity : constant Selected_Entity_Name := 1;
-   --  An artifical entity containing standard package
-
 
    type Profile_Kind is
      (Root_Data,
@@ -163,8 +157,8 @@ private
       Version  : aliased Change_Count := 0;
 
       Last_Name     : Entity_Name := 0;
-      Last_Selected : Selected_Entity_Name := 0;
-      Last_Profile  : Profile_Id := 1;  --  Reserve Empty_Procedure_Profile
+      Last_Selected : Selected_Entity_Name := Root_Name (Context);
+      Last_Profile  : Profile_Id := Empty_Procedure_Profile (Context);
    end record;
 
    function Hash (List : Selected_Entity_Name) return Ada.Containers.Hash_Type

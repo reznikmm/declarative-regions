@@ -16,7 +16,7 @@ project Declarative_Regions_Run is
      ("-gnat12", "-gnatW8", "-g");
 
    Check_Ada_Switches := Default_Ada_Switches &
-     ("-gnatVa", "-gnatwea", "-gnaty", "-gnata");
+     ("-gnatVa", "-gnatwa", "-gnaty", "-gnata");
 
    package Compiler is
       for Default_Switches ("ada") use Check_Ada_Switches;
